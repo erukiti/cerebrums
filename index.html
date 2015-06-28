@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <meta charset="utf-8">
+  <title>Cerebrums</title>
+  <link rel="stylesheet" href="./app.css">
+
+  <body>
+    <div class="main">
+      <div id="pane1">
+        <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
+        <textarea class="editor" data-bind="textinput: @editor"></textarea>
+      </div>
+      <div id="pane2">
+        <div class="viewer" data-bind="html: viewer"></div>
+      </div>
+    </div>
+	  <script>
+      Rx = require('rx')
+      wx = require('./node_modules/webrx/dist/web.rx')
+
+	    require('coffee-script/register');
+	    require('./renderer.coffee')
+	  </script>
+  </body>
+</html>

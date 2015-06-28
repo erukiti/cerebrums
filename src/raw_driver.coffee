@@ -1,11 +1,19 @@
 class RawDriver
-  constructor: (rxfs) ->
+  constructor: (rxfs, conf) ->
     @rxfs = rxfs
+    @conf = conf
 
-  blobWrite: (path, file) ->
-    @rxfs.writeFile(path, file)
+  writeBlob: (hash, file) ->
+    @rxfs.writeFile("#{@conf.basePath}/blob/#{hash}", file)
 
+  writePointer: (uuid, file) ->
+    @rxfs.writeFile("#{@conf.basePath}/pointer/#{uuid}", file)
 
+  readBlob: (hash) ->
+    @rxfs.readfile("#{@conf.basePath}/blob/#{hash}")
+
+  readPointer: (uuid) ->
+    @rxfs.readfile("#{@conf.basePath}/pointer/#{uuid}")
 
 
 
