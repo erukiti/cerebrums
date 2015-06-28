@@ -1,0 +1,25 @@
+{
+  "name": "cerebrums",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "coffee-script": "^1.9.3",
+    "gulp": "^3.9.0",
+    "gulp-coffee": "^2.3.1",
+    "gulp-espower": "^0.10.1",
+    "gulp-mocha": "^2.1.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "power-assert": "^0.11.0",
+    "rx": "^2.5.3",
+    "rxjs-fs": "0.0.5",
+    "sha256": "^0.2.0",
+    "sinon": "^1.15.3",
+    "uuid-v4": "^0.1.0"
+  }
+}
