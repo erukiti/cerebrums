@@ -1,7 +1,7 @@
-
-
+Rx = require 'rx'
 sha256 = require 'sha256'
 uuidv4 = require 'uuid-v4'
+msgpack = require 'msgpack'
 
 class Storage
   constructor: (rawDriver) ->
@@ -36,5 +36,23 @@ class Storage
           metaHash = sha256(metaJson)
           @rawDriver.writeBlob(metaHash, metaJson).flatMap (x) =>
             @rawDriver.writePointer(uuid, metaHash)
+
+  open: (uuid) ->
+    read:
+      Rx.Observable.create (subscriber) =>
+        @rawDriver.readPointer(uuid).subscribe (metaHash) =>
+          @rawDriver.readBlob(metaHash).subscribe (metaMsgpack) =>
+            meta = msgpack.unpack(metaMsgpack)
+            contentHash = meta.sha256
+            delete meta.sha256
+            meta.type = 'meta'
+            subscriber.onNext(meta)
+            @rawDriver.readBlob(contentHash).subscribe (content) =>
+              subscriber.onNext({type: 'content', content: content})
+              subscriber.onCompleted()
+            , (err) => onError(err)
+          , (err) => onError(err)
+        , (err) => onError(err)
+
 
 module.exports = Storage

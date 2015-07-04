@@ -16,4 +16,4 @@ gulp.task 'test:make', [], ->
 
 gulp.task 'test:exec', ['test:make'], ->
   gulp.src(['espowered/*.js'])
-    .pipe mocha()
+    .pipe mocha({require: ['source-map-support/register']})

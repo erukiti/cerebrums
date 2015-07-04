@@ -10,7 +10,8 @@ phase. 1
 ----
 
 * とりあえずアクセスビューは、cmd+O と ESC で切り替え。tab は作らない
-* 
+* 起動時とcmd+Nは、新規file
+* cmd+O から開いた場合のみ、既存file open
 
 
 core

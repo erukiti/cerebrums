@@ -1,11 +1,10 @@
-require 'source-map-support'
-
 assert = require 'power-assert'
 sinon = require 'sinon'
 
 uuidv4 = require 'uuid-v4'
 sha256 = require 'sha256'
 Rx = require 'rx'
+msgpack = require 'msgpack'
 
 Storage = require '../src/storage.coffee'
 
@@ -45,7 +44,7 @@ describe 'Storage', ->
 
     dummyRawDriver.verify()
 
-  it '#read', ->
+  it '#read(uuid)', ->
     meta = {sha256: '4444'}
     dummyFunc = -> null
     dummyRawDriver = {readPointer: dummyFunc, readBlob: dummyFunc}
@@ -61,6 +60,28 @@ describe 'Storage', ->
 
     assert stubReadPointer.calledOnce
     assert stubReadBlob.calledTwice
+
+  describe '#open(uuid)', ->
+    it 'read normal', ->
+      meta = {sha256: '4444', title: 'hoge'}
+      dummyFunc = -> null
+      dummyRawDriver = {readPointer: dummyFunc, readBlob: dummyFunc}
+      stubReadPointer = sinon.stub(dummyRawDriver, 'readPointer')
+      stubReadBlob = sinon.stub(dummyRawDriver, 'readBlob')
+      stubReadPointer.withArgs('1111').returns(Rx.Observable.just('2222'))
+      stubReadBlob.withArgs('2222').returns(Rx.Observable.just(msgpack.pack(meta)))
+      stubReadBlob.withArgs('4444').returns(Rx.Observable.just('hogefuga'))
+
+      storage = new Storage(dummyRawDriver)
+      storage.open('1111').read.toArray().subscribe (data) ->
+        assert.deepEqual data, [
+          {type: 'meta', title: 'hoge'},
+          {type: 'content', content: 'hogefuga'}
+        ]
+
+      assert stubReadPointer.calledOnce
+      assert stubReadBlob.calledTwice
+
 
   it '#update', ->
     meta = {sha256: '4444'}
@@ -86,4 +107,3 @@ describe 'Storage', ->
     assert stubReadBlob.calledOnce
     assert stubWriteBlob.calledTwice
     assert stubWritePointer.calledOnce
-
