@@ -63,10 +63,7 @@ describe 'Storage', ->
 
       result = []
       storage = new Storage(dummyRawDriver)
-      Rx.Observable.merge(
-        storage.create(writeObservable),
-        Rx.Observable.empty()
-      ).subscribe (x) ->
+      storage.create(writeObservable).subscribe (x) ->
         result.push x
 
       assert.deepEqual result, [{type: 'saved'}, {type: 'saved'}]
@@ -135,10 +132,7 @@ describe 'Storage', ->
 
       result = []
       storage = new Storage(dummyRawDriver)
-      Rx.Observable.merge(
-        storage.open('1111', writeObservable),
-        Rx.Observable.empty()
-      ).subscribe (x) ->
+      storage.open('1111', writeObservable).subscribe (x) ->
         result.push x
 
       assert.deepEqual result, [
