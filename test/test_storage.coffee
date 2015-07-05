@@ -10,7 +10,7 @@ Storage = require '../src/storage.coffee'
 
 describe 'Storage', ->
   describe '#create(writeObservable)', ->
-    it 'normal case', ->
+    it 'normal', ->
       class DummyRawDriver
         constructor: ->
           @writeBlobCounter = 0
@@ -31,6 +31,7 @@ describe 'Storage', ->
             when 3
               meta = msgpack.unpack(content)
               assert meta.sha256 == '34bc1d987ef7374f827c850728e0305d564afe73698bf928c4f7d7b4151e6831'
+              assert meta.prevSha256 == '4cac15dfacf86b494af5f22ea6bdb24e1223bf2ef2d6718313a550ea290cda75'
               @hash = hash
 
           @writeBlobCounter++
