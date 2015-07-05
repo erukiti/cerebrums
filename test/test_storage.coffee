@@ -148,3 +148,8 @@ describe 'Storage', ->
       ]
 
       dummyRawDriver.verify()
+  
+  describe '#getRecent', ->
+    # @rawDriver.getRecent() のテストをするかどうか
+
+

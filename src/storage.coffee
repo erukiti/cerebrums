@@ -48,4 +48,7 @@ class Storage
         , (err) => onError(err)
       , (err) => onError(err)
 
+  getRecent: ->
+    
+
 module.exports = Storage

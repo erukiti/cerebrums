@@ -32,7 +32,7 @@ class MainModel
           @content = packet.content
           @viewModel.editor = @content
 
-    repository.getRecentByChanged().subscribe (lists) ->
+    repository.getRecent().subscribe (lists) ->
       @viewModel.recent.clear()
       lists.each (meta) ->
         @viewModel.recent.push meta
