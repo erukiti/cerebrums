@@ -43,18 +43,7 @@ class Storage
             subscriber.onNext({type: 'content', content: content})
           , (err) => onError(err)
 
-          writeObservable.subscribe (packet) =>
-            prevHash = contentHash
-            contentHash = sha256(packet.content)
-            @rawDriver.writeBlob(contentHash, packet.content).flatMap (x) =>
-              meta = {
-                sha256: contentHash
-              }
-              meta.prevSha256 = prevHash if prevHash
-              metaMsgpack = msgpack.pack(meta)
-              metaHash = sha256(metaMsgpack)
-              @rawDriver.writeBlob(metaHash, metaMsgpack).flatMap (x) =>
-                @rawDriver.writePointer(uuid, metaHash).subscribe (x) =>
+          _write(@rawDriver, new File(uuid), writeObservable, subscriber, contentHash)
 
         , (err) => onError(err)
       , (err) => onError(err)

@@ -13,8 +13,8 @@ describe 'Storage', ->
     it 'normal', ->
       class DummyRawDriver
         constructor: ->
-          @writeBlobCounter = 0
           @writePointerCounter = 0
+          @writeBlobCounter = 0
 
         writeBlob: (hash, content) ->
           switch @writeBlobCounter
@@ -61,71 +61,90 @@ describe 'Storage', ->
         content: 'fugahoge'
       }])
 
+      result = []
       storage = new Storage(dummyRawDriver)
       Rx.Observable.merge(
         storage.create(writeObservable),
         Rx.Observable.empty()
-      ).toArray().subscribe (x) ->
-        console.dir x
+      ).subscribe (x) ->
+        result.push x
 
+      assert.deepEqual result, [{type: 'saved'}, {type: 'saved'}]
       dummyRawDriver.verify()
 
   describe '#open(uuid, writeObservable)', ->
     it 'normal', ->
       class DummyRawDriver
         constructor: ->
-          @writeBlobCounter = 0
+          @readPointerCounter = 0
+          @readBlobCounter = 0
           @writePointerCounter = 0
+          @writeBlobCounter = 0
+
+        readPointer: (uuid) ->
+          assert uuid == '1111'
+          @readPointerCounter++
+          Rx.Observable.just('2222')
+
+        readBlob: (hash) ->
+          switch @readBlobCounter
+            when 0
+              assert hash == '2222'
+              @readBlobCounter++
+              Rx.Observable.just(msgpack.pack({sha256: '4444', title: 'hoge'}))
+            when 1
+              assert hash == '4444'
+              @readBlobCounter++
+              Rx.Observable.just('hogefuga')
 
         writeBlob: (hash, content) ->
           switch @writeBlobCounter
-            when 0 
-              assert hash == '4cac15dfacf86b494af5f22ea6bdb24e1223bf2ef2d6718313a550ea290cda75'
-              assert content == 'hogefuga'
-            when 1
-              meta = msgpack.unpack(content)
-              assert meta.sha256 == '4cac15dfacf86b494af5f22ea6bdb24e1223bf2ef2d6718313a550ea290cda75'
-              @hash = hash
-            when 2
+            when 0
               assert hash == '34bc1d987ef7374f827c850728e0305d564afe73698bf928c4f7d7b4151e6831'
               assert content == 'fugahoge'
-            when 3
+            when 1
               meta = msgpack.unpack(content)
               assert meta.sha256 == '34bc1d987ef7374f827c850728e0305d564afe73698bf928c4f7d7b4151e6831'
-              assert meta.prevSha256 == '4cac15dfacf86b494af5f22ea6bdb24e1223bf2ef2d6718313a550ea290cda75'
+              assert meta.prevSha256 == '4444'
+              assert meta.title == 'fuga'
               @hash = hash
 
           @writeBlobCounter++
           Rx.Observable.just(hash)
 
         writePointer: (uuid, content) ->
-          assert uuidv4.isUUID(uuid)
+          assert uuid == '1111'
           assert content == @hash
           @writePointerCounter++
           Rx.Observable.just(@writePointerCounter)
 
         verify: ->
-          assert @writeBlobCounter == 4 && @writePointerCounter == 2
+          assert @readPointerCounter == 1 &&
+            @readBlobCounter == 2 &&
+            @writePointerCounter == 1 &&
+            @writeBlobCounter == 2
 
       dummyObservable = {}
       dummyRawDriver = new DummyRawDriver()
 
       writeObservable = Rx.Observable.from([{
         type: 'save'
-        meta: {title: 'hoge'}
-        content: 'hogefuga'
-      }, {
-        type: 'save'
         meta: {title: 'fuga'}
         content: 'fugahoge'
       }])
 
+      result = []
       storage = new Storage(dummyRawDriver)
       Rx.Observable.merge(
-        storage.create(writeObservable),
+        storage.open('1111', writeObservable),
         Rx.Observable.empty()
-      ).toArray().subscribe (x) ->
-        console.dir x
+      ).subscribe (x) ->
+        result.push x
+
+      assert.deepEqual result, [
+        {type: 'meta', title: 'hoge'},
+        {type: 'content', content: 'hogefuga'},
+        {type: 'saved'}
+      ]
 
       dummyRawDriver.verify()
-
