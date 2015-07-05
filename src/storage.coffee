@@ -49,6 +49,6 @@ class Storage
       , (err) => onError(err)
 
   getRecent: ->
-    
+    @rawDriver.getRecent()
 
 module.exports = Storage
