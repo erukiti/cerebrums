@@ -9,39 +9,14 @@ class Storage
   constructor: (rawDriver) ->
     @rawDriver = rawDriver
 
-  create: (content, func) ->
-    dataHash = sha256(content)
-    @rawDriver.writeBlob(dataHash, content).flatMap (x) =>
-      meta = {
-        sha256: dataHash
-      }
-      metaJson = JSON.stringify(meta)
-      metaHash = sha256(metaJson)
-      @rawDriver.writeBlob(metaHash, metaJson).flatMap (x) =>
-        uuid = uuidv4()
-        @rawDriver.writePointer(uuid, metaHash)
-
-  update: (uuid, content) ->
-    @rawDriver.readPointer(uuid).flatMap (metaHash) =>
-      @rawDriver.readBlob(metaHash).flatMap (metaJson) =>
-        meta = JSON.parse(metaJson)
-        dataHash = sha256(content)
-        @rawDriver.writeBlob(dataHash, content).flatMap (x) =>
-          meta.sha256 = dataHash
-          metaJson = JSON.stringify(meta)
-          metaHash = sha256(metaJson)
-          @rawDriver.writeBlob(metaHash, metaJson).flatMap (x) =>
-            @rawDriver.writePointer(uuid, metaHash)
-
   _write = (rawDriver, file, writeObservable, subscriber, prevHash) ->
     return unless writeObservable
     writeObservable.subscribe (packet) =>
       file.content = packet.content
       contentHash = sha256(file.content)
       rawDriver.writeBlob(contentHash, file.content).subscribe (x) =>
-        meta = {
-          sha256: contentHash
-        }
+        meta = packet.meta
+        meta.sha256 = contentHash
         meta.prevSha256 = prevHash if prevHash
         metaMsgpack = msgpack.pack(meta)
         metaHash = sha256(packet.content)
