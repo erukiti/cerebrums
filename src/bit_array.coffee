@@ -110,6 +110,7 @@ class BitArray
   rank0: (pos) ->
     # console.log "rank0:#{pos}"
     return 0 if pos == 0
+    build() if @dirty
 
     pos--
     popCount = Math.floor(pos / 8 / 64) * 8 * 64 - 
@@ -134,6 +135,7 @@ class BitArray
   rank1: (pos) ->
     # console.log "rank1:#{pos}"
     return 0 if pos == 0
+    build() if @dirty
 
     pos--
     lergePos = Math.floor(pos / 8 / 64)
