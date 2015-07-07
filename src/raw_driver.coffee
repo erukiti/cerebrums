@@ -15,6 +15,8 @@ class RawDriver
   readPointer: (uuid) ->
     @rxfs.readfile("#{@conf.basePath}/pointer/#{uuid}")
 
+  getRecent: ->
+    
 
 
 module.exports = RawDriver

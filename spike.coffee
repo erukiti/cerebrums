@@ -5,7 +5,7 @@ rxfs = require 'rxjs-fs'
 
 # console.dir rxfs.fs.read
 
-rxfs.fs.readfile('dummy').subscribe(
+rxfs.fs.readdir('.').subscribe(
   (x) -> console.dir x
   (err) -> console.dir err.code
   ->  console.dir 'comp'
