@@ -3,8 +3,8 @@ class BitArray
     @buf = new Buffer(Math.floor(size / 8) + 1)
     @buf.fill(0)
     @size = size
-    @lergeCount = new Array(Math.floor(size / 8 / 256 + 1 + 1))
-    @smallCount = new Array(Math.floor(size / 8 / 8 + 1 + 1))
+    @lergeCount = new Uint32Array(Math.floor(size / 8 / 64 + 1 + 1))
+    @smallCount = new Uint16Array(Math.floor(size / 8 / 8 + 1 + 1))
     @dirty = false
 
   get: (pos) ->
@@ -40,12 +40,12 @@ class BitArray
     n
 
   build: ->
-    lergeCount = 0
     popCount = 0
     ptr = 0
 
     while ptr <= Math.floor(@size / 8)
-      @lergeCount[Math.floor(ptr / 256)] = lergeCount
+      lergeCount = popCount
+      @lergeCount[Math.floor(ptr / 64)] = lergeCount
       @smallCount[Math.floor(ptr / 8)] = 0
 
       break unless ptr + 8 <= Math.floor(@size / 8)
@@ -102,7 +102,6 @@ class BitArray
 
       popCount += _popcount_4byte(@buf, ptr)
       popCount += _popcount_4byte(@buf, ptr + 4)
-      lergeCount[Math.floor(ptr / 8) + 1] = popCount
 
       ptr += 8
 
@@ -113,7 +112,10 @@ class BitArray
     return 0 if pos == 0
 
     pos--
-    popCount = Math.floor(pos / 8 / 8) * 8 * 8 - @smallCount[Math.floor(pos / 8 / 8)]
+    popCount = Math.floor(pos / 8 / 64) * 8 * 64 - 
+               @lergeCount[Math.floor(pos / 8 / 64)] + 
+               Math.floor(pos / 8 / 8) % 8 * 8 * 8 - 
+               @smallCount[Math.floor(pos / 8 / 8)]
 
     popCount += 8 - _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 0]) if Math.floor(pos / 8) % 8 > 0
     popCount += 8 - _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 1]) if Math.floor(pos / 8) % 8 > 1
@@ -134,7 +136,11 @@ class BitArray
     return 0 if pos == 0
 
     pos--
-    popCount = @smallCount[Math.floor(pos / 8 / 8)]
+    lergePos = Math.floor(pos / 8 / 64)
+    smallPos = Math.floor(pos / 8 / 8)
+
+    popCount = @lergeCount[lergePos] + 
+               @smallCount[smallPos]
 
     popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 0]) if Math.floor(pos / 8) % 8 > 0
     popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 1]) if Math.floor(pos / 8) % 8 > 1

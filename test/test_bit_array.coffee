@@ -66,36 +66,35 @@ describe 'BitArray', ->
     size = 9
     test(size, generate(size))
 
-  it 'size = 17', ->
-    size = 17
-    test(size, generate(size))
-
-  it 'size = 25', ->
-    size = 25
-    test(size, generate(size))
-
-  it 'size = 33', ->
-    size = 33
-    test(size, generate(size))
-
-  it 'size = 41', ->
-    size = 41
-    test(size, generate(size))
-
-  it 'size = 49', ->
-    size = 49
-    test(size, generate(size))
-
-  it 'size = 57', ->
-    size = 57
-    test(size, generate(size))
+  it 'size = 17, 25, 33, 41, 49, 57', ->
+    test(17, generate(17))
+    test(25, generate(25))
+    test(33, generate(33))
+    test(41, generate(41))
+    test(49, generate(49))
+    test(57, generate(57))
 
   it 'size = 65', ->
     size = 65
     test(size, generate(size))
 
-  # it 'size = 73', ->
-  #   size = 73
-  #   test(size, generate(size))
+  it 'size = 73', ->
+    size = 73
+    test(size, generate(size))
 
+  it 'size = 129, 193, 257, 321, 385, 469', ->
+    test(129, generate(129))
+    test(193, generate(193))
+    test(257, generate(257))
+    test(321, generate(321))
+    test(385, generate(385))
+    test(449, generate(449))
 
+  it 'size = 513', ->
+    test(513, generate(513))
+
+  it 'size = 1537', ->
+    test(1537, generate(1537))
+
+  it 'size = 30000', ->
+    test(30000, generate(30000))
