@@ -140,17 +140,18 @@ class BitArray
     pos--
     lergePos = Math.floor(pos / 8 / 64)
     smallPos = Math.floor(pos / 8 / 8)
+    bufPos = Math.floor(pos / 8)
 
     popCount = @lergeCount[lergePos] + 
                @smallCount[smallPos]
 
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 0]) if Math.floor(pos / 8) % 8 > 0
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 1]) if Math.floor(pos / 8) % 8 > 1
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 2]) if Math.floor(pos / 8) % 8 > 2
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 3]) if Math.floor(pos / 8) % 8 > 3
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 4]) if Math.floor(pos / 8) % 8 > 4
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 5]) if Math.floor(pos / 8) % 8 > 5
-    popCount += _popcount_1byte(@buf[Math.floor(pos / 8 / 8) * 8 + 6]) if Math.floor(pos / 8) % 8 > 6
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 0]) if bufPos % 8 > 0
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 1]) if bufPos % 8 > 1
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 2]) if bufPos % 8 > 2
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 3]) if bufPos % 8 > 3
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 4]) if bufPos % 8 > 4
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 5]) if bufPos % 8 > 5
+    popCount += _popcount_1byte(@buf[Math.floor(bufPos / 8) * 8 + 6]) if bufPos % 8 > 6
 
     bitmask = ((255 << 8) >>> (pos % 8 + 1))
     popCount += _popcount_1byte(@buf[Math.floor(pos / 8)] & bitmask)
@@ -158,7 +159,10 @@ class BitArray
     popCount
 
   rank: (pos, bit) ->
-    bit ? rank1(pos) : rank0(pos)
+    if bit
+      rank1(pos)
+    else
+      rank0(pos)
 
   select0: (ind) ->
 
