@@ -157,6 +157,9 @@ class BitArray
 
     popCount
 
+  rank: (pos, bit) ->
+    bit ? rank1(pos) : rank0(pos)
+
   select0: (ind) ->
 
 
