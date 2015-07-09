@@ -38,9 +38,14 @@ test = (size, expected) ->
     assert expected.bitArray.rank1(i) == expected.rank1[i]
 
   i = 1
-  while i < expected.rank1[size]
-    assert expected.rank1[expected.bitArray.select1(i) + 1] == i
+  while i < expected.rank0[size]
+    assert expected.rank0[expected.bitArray.select0(i) + 1] == i
     i++
+
+  # i = 1
+  # while i < expected.rank1[size]
+  #   assert expected.rank1[expected.bitArray.select1(i) + 1] == i
+  #   i++
 
 describe 'BitArray', ->
   it 'size = 3', ->

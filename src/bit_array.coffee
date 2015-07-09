@@ -178,7 +178,7 @@ class BitArray
       if bit
         rank = @lergeCount[ptr]
       else
-        rank = 8 * 64 - @lergeCount[ptr]
+        rank = ptr * 8 * 64 - @lergeCount[ptr]
 
       if ind <= rank
         right = ptr
@@ -188,21 +188,23 @@ class BitArray
     if bit
       ind -= @lergeCount[right]
     else
-      ind -= 8 * 8 - @lergeCount[right]
+      ind -= right * 8 * 64 - @lergeCount[right]
 
+    # console.log "#{ind}, #{left}, #{right}"
     left = right * 8 
     right = left + Math.floor(@size / 8 / 8) % 8
     if left == right
       right++
+
     # console.dir @smallCount
-    # console.log "small: #{left}, #{right}"
+    # console.log "#{ind}, #{left}, #{right}"
 
     while left < right
       ptr = Math.floor((left + right) / 2)
       if bit
         rank = @smallCount[ptr]
       else
-        rank = 8 * 8 - @smallCount[ptr]
+        rank = (ptr % 8) * 8 * 8 - @smallCount[ptr]
 
       if ind <= rank
         right = ptr
@@ -212,7 +214,7 @@ class BitArray
     if bit
       ind -= @smallCount[right]
     else
-      ind -= 8 * 8 - @smallCount[right]
+      ind -= (right % 8) * 8 * 8 - @smallCount[right]
 
     # console.log "small: #{ind}, #{left}, #{right}"
 
@@ -228,7 +230,7 @@ class BitArray
       while bitmask > 0
         # console.log "*#{ind}, #{cnt}"
         # console.dir (n & bitmask).toString(2)
-        if n & bitmask
+        if (bit && n & bitmask) || (!bit && (n & bitmask) == 0)
           ind--
         break if ind == 0
         bitmask >>>= 1
