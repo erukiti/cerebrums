@@ -37,6 +37,11 @@ test = (size, expected) ->
     assert expected.bitArray.rank0(i) == expected.rank0[i]
     assert expected.bitArray.rank1(i) == expected.rank1[i]
 
+  i = 1
+  while i < expected.rank1[size]
+    assert expected.rank1[expected.bitArray.select1(i) + 1] == i
+    i++
+
 describe 'BitArray', ->
   it 'size = 3', ->
     size = 3
@@ -74,10 +79,6 @@ describe 'BitArray', ->
     test(49, generate(49))
     test(57, generate(57))
 
-  it 'size = 65', ->
-    size = 65
-    test(size, generate(size))
-
   it 'size = 73', ->
     size = 73
     test(size, generate(size))
@@ -97,4 +98,4 @@ describe 'BitArray', ->
     test(1537, generate(1537))
 
   it 'size = 30000', ->
-    test(30000, generate(30000))
+      test(30000, generate(30000))

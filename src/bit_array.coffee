@@ -164,10 +164,84 @@ class BitArray
     else
       rank0(pos)
 
-  select0: (ind) ->
+  select: (ind, bit) ->
+    # console.log "select #{ind}, #{bit}"
+    left = 0
+    right = Math.floor(@size / 8 / 64)
+    if left == right
+      right++
+    # console.dir @lergeCount
+    # console.log "lerge: #{left}, #{right}"
 
+    while left < right
+      ptr = Math.floor((left + right) / 2)
+      if bit
+        rank = @lergeCount[ptr]
+      else
+        rank = 8 * 64 - @lergeCount[ptr]
+
+      if ind <= rank
+        right = ptr
+      else
+        left = ptr + 1
+    right--
+    if bit
+      ind -= @lergeCount[right]
+    else
+      ind -= 8 * 8 - @lergeCount[right]
+
+    left = right * 8 
+    right = left + Math.floor(@size / 8 / 8) % 8
+    if left == right
+      right++
+    # console.dir @smallCount
+    # console.log "small: #{left}, #{right}"
+
+    while left < right
+      ptr = Math.floor((left + right) / 2)
+      if bit
+        rank = @smallCount[ptr]
+      else
+        rank = 8 * 8 - @smallCount[ptr]
+
+      if ind <= rank
+        right = ptr
+      else
+        left = ptr + 1
+    right--
+    if bit
+      ind -= @smallCount[right]
+    else
+      ind -= 8 * 8 - @smallCount[right]
+
+    # console.log "small: #{ind}, #{left}, #{right}"
+
+    pos = right * 8
+
+    # console.log "-- #{ind}, #{pos}"
+    cnt = 0
+    while ind > 0 && pos * 8 < @size
+      n = @buf[pos]
+      bitmask = 0x80
+      cnt = 0
+      # console.log n.toString(2)
+      while bitmask > 0
+        # console.log "*#{ind}, #{cnt}"
+        # console.dir (n & bitmask).toString(2)
+        if n & bitmask
+          ind--
+        break if ind == 0
+        bitmask >>>= 1
+        cnt++
+      break if ind == 0
+      pos++
+
+    pos * 8 + cnt
+
+  select0: (ind) ->
+    @select(ind, 0)
 
   select1: (ind) ->
-
+    @select(ind, 1)
 
 module.exports = BitArray
