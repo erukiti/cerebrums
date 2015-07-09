@@ -190,35 +190,23 @@ class BitArray
     else
       ind -= right * 8 * 64 - @lergeCount[right]
 
-    # console.log "#{ind}, #{left}, #{right}"
-    left = right * 8 
-    right = left + Math.floor(@size / 8 / 8) % 8
-    if left == right
-      right++
-
-    # console.dir @smallCount
-    # console.log "#{ind}, #{left}, #{right}"
-
-    while left < right
-      ptr = Math.floor((left + right) / 2)
+    posSmall = right * 8 + Math.floor(@size / 8 / 8) % 8
+    while posSmall >= right * 8
       if bit
-        rank = @smallCount[ptr]
+        rank = @smallCount[posSmall]
       else
-        rank = (ptr % 8) * 8 * 8 - @smallCount[ptr]
+        rank = (posSmall % 8) * 8 * 8 - @smallCount[posSmall]
 
-      if ind <= rank
-        right = ptr
-      else
-        left = ptr + 1
-    right--
-    if bit
-      ind -= @smallCount[right]
-    else
-      ind -= (right % 8) * 8 * 8 - @smallCount[right]
+      if ind > rank
+        ind -= rank
+        break
 
-    # console.log "small: #{ind}, #{left}, #{right}"
+      posSmall--
 
-    pos = right * 8
+    if posSmall < right * 8
+      posSmall = right * 8
+
+    pos = posSmall * 8
 
     # console.log "-- #{ind}, #{pos}"
     cnt = 0
