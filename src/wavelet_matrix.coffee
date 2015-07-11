@@ -90,6 +90,22 @@ class WaveletMatrix
 
     ind - @starts[c]
 
+# select: () ->
 
+  get: (ind) ->
+    bits = @bits
+    cnt = 0
+    c = 0
+    bitmask = 1 << (bits - 1)
+    while bitmask > 0
+      if @bitStreams[cnt].get(ind)
+        c |= bitmask
+        ind = @c0size[cnt] + @bitStreams[cnt].rank1(ind)
+      else
+        ind = @bitStreams[cnt].rank0(ind)
+      cnt++
+      bitmask >>>= 1
+
+    c
 
 module.exports = WaveletMatrix
