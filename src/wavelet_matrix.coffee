@@ -11,7 +11,7 @@ class WaveletMatrix
       bits--
     0
 
-  getChar = (elem) ->
+  _getChar = (elem) ->
     if typeof elem == 'string'
       elem.charCodeAt(0) 
     else
@@ -21,12 +21,14 @@ class WaveletMatrix
     unless bits
       c1 = 0
       for c in str
-        c1 |= getChar(c)
+        c1 |= _getChar(c)
 
       bits = countBits(c1)
 
+    @bits = bits
     @bitStreams = Array(bits)
     @c0size = Array(bits)
+    @starts = Array(2 << (bits - 1))
     cnt = 0
     bitmask = 1 << (bits - 1)
     while bitmask > 0
@@ -35,7 +37,7 @@ class WaveletMatrix
       c0 = []
       c1 = []
       for c in str
-        if getChar(c) & bitmask
+        if _getChar(c) & bitmask
           c1.push c
           @bitStreams[cnt].set1(index)
         else
@@ -49,9 +51,45 @@ class WaveletMatrix
 
       bitmask >>>= 1
 
-    for bitStream in @bitStreams
-      console.dir bitStream.toString()
-    for n in @c0size
-      console.log n
+    n = -1
+    i = 0
+    for c in str
+      if n != c
+        @starts[c] = i
+        n = c
+      i++
+
+    # for bitStream in @bitStreams
+    #   console.dir bitStream.toString()
+    # for n in @c0size
+    #   console.log n
+
+  rank: (ind, c) ->
+    return 0 if ind == 0
+    if typeof c == 'string'
+      c = c.charCodeAt(0)
+
+    return 0 if @starts[c] == undefined
+
+    # c が bits の範囲かどうかチェック
+    bits = @bits
+
+    cnt = 0
+    bitmask = 1 << (bits - 1)
+    while bitmask > 0
+      if c & bitmask
+        ind = @c0size[cnt] + @bitStreams[cnt].rank1(ind)
+      else
+        ind = @bitStreams[cnt].rank0(ind)
+      cnt++
+      bitmask >>>= 1
+      # console.log ind
+      # return 0 if ind == 0
+
+    # console.log "#{c}, #{@starts[c]}, #{ind}"
+
+    ind - @starts[c]
+
+
 
 module.exports = WaveletMatrix
