@@ -24,6 +24,14 @@ describe 'WaveletMatrix', ->
       assert wm.rank(22, 4) == 1
       assert wm.rank(22, 3) == 0
 
+    it '', ->
+      wm = new WaveletMatrix('abbracadabbra')
+      assert wm.rank(0, 'a') == 0
+      assert wm.rank(1, 'a') == 1
+      assert wm.rank(8, 'a') == 3
+      assert wm.rank(8, 'b') == 2
+      assert wm.rank(8, 'r') == 1
+
   describe '#get', ->
     it '', ->
       wm = new WaveletMatrix([11, 0, 15, 6, 5, 2, 7, 12, 11, 0, 12, 12, 13, 4, 6, 13, 1, 11, 6, 1, 7, 10, 2, 7, 14, 11, 1, 7, 5, 4, 14, 6])
@@ -38,3 +46,19 @@ describe 'WaveletMatrix', ->
       assert wm.get(8) == 11
       assert wm.get(9) == 0
       assert wm.get(22) == 2
+
+    it '', ->
+      wm = new WaveletMatrix('abbracadabbra')
+      assert wm.get(0) == 'a'.charCodeAt(0)
+      assert wm.get(1) == 'b'.charCodeAt(0)
+      assert wm.get(2) == 'b'.charCodeAt(0)
+      assert wm.get(3) == 'r'.charCodeAt(0)
+      assert wm.get(4) == 'a'.charCodeAt(0)
+      assert wm.get(5) == 'c'.charCodeAt(0)
+      assert wm.get(6) == 'a'.charCodeAt(0)
+      assert wm.get(7) == 'd'.charCodeAt(0)
+      assert wm.get(8) == 'a'.charCodeAt(0)
+      assert wm.get(9) == 'b'.charCodeAt(0)
+      assert wm.get(10) == 'b'.charCodeAt(0)
+      assert wm.get(11) == 'r'.charCodeAt(0)
+      assert wm.get(12) == 'a'.charCodeAt(0)

@@ -54,11 +54,13 @@ class WaveletMatrix
     n = -1
     i = 0
     for c in str
+      c = _getChar(c)
       if n != c
         @starts[c] = i
         n = c
       i++
 
+    # console.log str
     # for bitStream in @bitStreams
     #   console.dir bitStream.toString()
     # for n in @c0size
@@ -77,6 +79,7 @@ class WaveletMatrix
     cnt = 0
     bitmask = 1 << (bits - 1)
     while bitmask > 0
+      # console.log "#{c & bitmask}, #{ind}"
       if c & bitmask
         ind = @c0size[cnt] + @bitStreams[cnt].rank1(ind)
       else
