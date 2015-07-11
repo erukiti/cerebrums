@@ -48,59 +48,59 @@ test = (size, expected) ->
     i++
 
 describe 'BitArray', ->
-  it 'size = 3', ->
-    size = 3
-    test(size, generate(size, '0b000'))
-    test(size, generate(size, '0b001'))
-    test(size, generate(size, '0b010'))
-    test(size, generate(size, '0b011'))
-    test(size, generate(size, '0b100'))
-    test(size, generate(size, '0b101'))
-    test(size, generate(size, '0b110'))
-    test(size, generate(size, '0b111'))
+  # it 'size = 3', ->
+  #   size = 3
+  #   test(size, generate(size, '0b000'))
+  #   test(size, generate(size, '0b001'))
+  #   test(size, generate(size, '0b010'))
+  #   test(size, generate(size, '0b011'))
+  #   test(size, generate(size, '0b100'))
+  #   test(size, generate(size, '0b101'))
+  #   test(size, generate(size, '0b110'))
+  #   test(size, generate(size, '0b111'))
 
-  it 'size = 8', ->
-    size = 8
-    test(size, generate(size), '0b11111111')
-    test(size, generate(size), '0b10000000')
-    test(size, generate(size), '0b01000000')
-    test(size, generate(size), '0b00100000')
-    test(size, generate(size), '0b00010000')
-    test(size, generate(size), '0b00001000')
-    test(size, generate(size), '0b00000100')
-    test(size, generate(size), '0b00000010')
-    test(size, generate(size), '0b00000001')
-    test(size, generate(size), '0b00000000')
+  # it 'size = 8', ->
+  #   size = 8
+  #   test(size, generate(size), '0b11111111')
+  #   test(size, generate(size), '0b10000000')
+  #   test(size, generate(size), '0b01000000')
+  #   test(size, generate(size), '0b00100000')
+  #   test(size, generate(size), '0b00010000')
+  #   test(size, generate(size), '0b00001000')
+  #   test(size, generate(size), '0b00000100')
+  #   test(size, generate(size), '0b00000010')
+  #   test(size, generate(size), '0b00000001')
+  #   test(size, generate(size), '0b00000000')
 
-  it 'size = 9', ->
-    size = 9
-    test(size, generate(size))
+  # it 'size = 9', ->
+  #   size = 9
+  #   test(size, generate(size))
 
-  it 'size = 17, 25, 33, 41, 49, 57', ->
-    test(17, generate(17))
-    test(25, generate(25))
-    test(33, generate(33))
-    test(41, generate(41))
-    test(49, generate(49))
-    test(57, generate(57))
+  # it 'size = 17, 25, 33, 41, 49, 57', ->
+  #   test(17, generate(17))
+  #   test(25, generate(25))
+  #   test(33, generate(33))
+  #   test(41, generate(41))
+  #   test(49, generate(49))
+  #   test(57, generate(57))
 
-  it 'size = 73', ->
-    size = 73
-    test(size, generate(size))
+  # it 'size = 73', ->
+  #   size = 73
+  #   test(size, generate(size))
 
-  it 'size = 129, 193, 257, 321, 385, 469', ->
-    test(129, generate(129))
-    test(193, generate(193))
-    test(257, generate(257))
-    test(321, generate(321))
-    test(385, generate(385))
-    test(449, generate(449))
+  # it 'size = 129, 193, 257, 321, 385, 469', ->
+  #   test(129, generate(129))
+  #   test(193, generate(193))
+  #   test(257, generate(257))
+  #   test(321, generate(321))
+  #   test(385, generate(385))
+  #   test(449, generate(449))
 
-  it 'size = 513', ->
-    test(513, generate(513))
+  # it 'size = 513', ->
+  #   test(513, generate(513))
 
-  it 'size = 1537', ->
-    test(1537, generate(1537))
+  # it 'size = 1537', ->
+  #   test(1537, generate(1537))
 
-  it 'size = 30000', ->
-    test(30000, generate(30000))
+  # it 'size = 30000', ->
+  #   test(30000, generate(30000))

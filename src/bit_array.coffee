@@ -7,6 +7,22 @@ class BitArray
     @smallCount = new Uint16Array(Math.floor(size / 8 / 8 + 1 + 1))
     @dirty = false
 
+  toString: () ->
+    s = ''
+
+    size = @size
+    for byte in @buf
+      bitmask = 0x80
+      while bitmask > 0
+        if byte & bitmask
+          s += '1'
+        else
+          s += '0'
+        bitmask >>>= 1
+        size--
+        return s if size <= 0
+    s
+
   get: (pos) ->
     n = @buf[Math.floor(pos / 8)]
     n & (128 >> (pos % 8)) ? 1 : 0
@@ -18,6 +34,7 @@ class BitArray
     @dirty = true
 
   set1: (pos) ->
+    # console.log "set1: #{pos}/#{@size}"
     n = @buf[Math.floor(pos / 8)]
     n |= 128 >> (pos % 8)
     @buf.writeUInt8(n, Math.floor(pos / 8))
