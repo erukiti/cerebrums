@@ -16,7 +16,10 @@ class Storage
       contentHash = sha256(file.content)
       rawDriver.writeBlob(contentHash, file.content).subscribe (x) =>
         meta = packet.meta
+        console.dir meta
         meta.sha256 = contentHash
+        meta.createdAt = (new Date()).toISOString() unless prevHash
+        meta.updatedAt = (new Date()).toISOString()
         meta.prevSha256 = prevHash if prevHash
         metaMsgpack = msgpack.pack(meta)
         metaHash = sha256(packet.content)
@@ -49,6 +52,8 @@ class Storage
       , (err) => onError(err)
 
   getRecent: ->
-    @rawDriver.getRecent()
+    # @rawDriver.getRecent().subscribe (uuids) ->
+    #   for uuid in uuids
+
 
 module.exports = Storage

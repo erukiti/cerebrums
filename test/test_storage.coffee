@@ -11,6 +11,9 @@ Storage = require '../src/storage.coffee'
 describe 'Storage', ->
   describe '#create(writeObservable)', ->
     it 'normal', ->
+      fakeTime = Date.parse('2015-07-12T00:00:00.000Z')
+      fakeTimeStr = (new Date(fakeTime)).toISOString()
+
       class DummyRawDriver
         constructor: ->
           @writePointerCounter = 0
@@ -24,6 +27,8 @@ describe 'Storage', ->
             when 1
               meta = msgpack.unpack(content)
               assert meta.sha256 == '4cac15dfacf86b494af5f22ea6bdb24e1223bf2ef2d6718313a550ea290cda75'
+              assert meta.createdAt == fakeTimeStr
+              assert meta.updatedAt == fakeTimeStr
               assert meta.title == 'hoge'
               @hash = hash
             when 2
@@ -61,6 +66,8 @@ describe 'Storage', ->
         content: 'fugahoge'
       }])
 
+      clock = sinon.useFakeTimers(fakeTime)
+
       result = []
       storage = new Storage(dummyRawDriver)
       storage.create(writeObservable).subscribe (x) ->
@@ -69,8 +76,13 @@ describe 'Storage', ->
       assert.deepEqual result, [{type: 'saved'}, {type: 'saved'}]
       dummyRawDriver.verify()
 
+      clock.restore()
+
   describe '#open(uuid, writeObservable)', ->
     it 'normal', ->
+      fakeTime = Date.parse('2015-07-12T00:00:00.000Z')
+      fakeTimeStr = (new Date(fakeTime)).toISOString()
+
       class DummyRawDriver
         constructor: ->
           @readPointerCounter = 0
@@ -88,7 +100,7 @@ describe 'Storage', ->
             when 0
               assert hash == '2222'
               @readBlobCounter++
-              Rx.Observable.just(msgpack.pack({sha256: '4444', title: 'hoge'}))
+              Rx.Observable.just(msgpack.pack({sha256: '4444', title: 'hoge', createdAt: '2015-07-11T00:00:00.000Z', updatedAt: '2015-07-11T00:00:00.000Z'}))
             when 1
               assert hash == '4444'
               @readBlobCounter++
@@ -102,6 +114,8 @@ describe 'Storage', ->
             when 1
               meta = msgpack.unpack(content)
               assert meta.sha256 == '34bc1d987ef7374f827c850728e0305d564afe73698bf928c4f7d7b4151e6831'
+              assert meta.createdAt == '2015-07-11T00:00:00.000Z'
+              assert meta.updatedAt == fakeTimeStr
               assert meta.prevSha256 == '4444'
               assert meta.title == 'fuga'
               @hash = hash
@@ -126,9 +140,11 @@ describe 'Storage', ->
 
       writeObservable = Rx.Observable.from([{
         type: 'save'
-        meta: {title: 'fuga'}
+        meta: {title: 'fuga', createdAt: '2015-07-11T00:00:00.000Z', updatedAt: '2015-07-11T00:00:00.000Z'}
         content: 'fugahoge'
       }])
+
+      clock = sinon.useFakeTimers(fakeTime)
 
       result = []
       storage = new Storage(dummyRawDriver)
@@ -136,14 +152,30 @@ describe 'Storage', ->
         result.push x
 
       assert.deepEqual result, [
-        {type: 'meta', title: 'hoge'},
+        {type: 'meta', title: 'hoge', createdAt: '2015-07-11T00:00:00.000Z', updatedAt: '2015-07-11T00:00:00.000Z'},
         {type: 'content', content: 'hogefuga'},
         {type: 'saved'}
       ]
 
       dummyRawDriver.verify()
   
+      clock.restore()
+
   describe '#getRecent', ->
-    # @rawDriver.getRecent() のテストをするかどうか
+    dummyFunc = -> null
+    dummyRawDriver = {getRecent: dummyFunc, readPointer: dummyFunc, readBlob: dummyFunc}
+    stubGetRecent = sinon.stub(dummyRawDriver, 'getRecent')
+    stubGetRecent.withArgs().returns(Rx.Observable.just(['1111', '2222']))
+    stubReadPointer = sinon.stub(dummyRawDriver, 'readPointer')
+    stubReadPointer.withArgs('1111').returns(Rx.Observable.just('3333'))
+    stubReadPointer.withArgs('2222').returns(Rx.Observable.just('4444'))
+    stubReadBlob = sinon.stub(dummyRawDriver, 'readBlob')
+    stubReadBlob.withArgs('3333').returns(Rx.Observable.just())
+
+
+
+    # storage = new Storage(dummyRawDriver)
+    # storage.getRecent().subscribe (x) ->
+    #   console.dir x
 
 

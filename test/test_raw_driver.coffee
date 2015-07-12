@@ -1,6 +1,8 @@
 assert = require 'power-assert'
 sinon = require 'sinon'
 
+Rx = require 'rx'
+
 RawDriver = require '../src/raw_driver.coffee'
 
 describe 'RawDriver', ->
@@ -54,3 +56,16 @@ describe 'RawDriver', ->
     assert rawDriver.readPointer('1234') == dummyObservable
 
     assert stub.calledOnce
+
+  it '#getRecent', ->
+    dummyObservable = {}
+    dummyFunc = -> null
+    rxfs = {readdir: dummyFunc}
+    stubReaddir = sinon.stub(rxfs, 'readdir')
+    stubReaddir.withArgs('/path/pointer').returns(Rx.Observable.just(['/path/pointer/1111']))
+
+    rawDriver = new RawDriver(rxfs, {basePath: '/path'})
+    rawDriver.getRecent().subscribe (uuids) ->
+      assert.deepEqual uuids, ['1111']
+
+    assert stubReaddir.calledOnce

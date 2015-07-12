@@ -16,7 +16,9 @@ class RawDriver
     @rxfs.readfile("#{@conf.basePath}/pointer/#{uuid}")
 
   getRecent: ->
-    
+    @rxfs.readdir("#{@conf.basePath}/pointer").map (dirs) =>
+      for dir in dirs
+        dir.substr("#{@conf.basePath}/pointer/".length)
 
 
 module.exports = RawDriver

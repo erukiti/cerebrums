@@ -25,6 +25,8 @@ class WaveletMatrix
 
       bits = countBits(c1)
 
+    # get のために、typeof str を取っておくべきか
+
     @bits = bits
     @bitStreams = Array(bits)
     @c0size = Array(bits)
