@@ -16,7 +16,6 @@ class Storage
       contentHash = sha256(file.content)
       rawDriver.writeBlob(contentHash, file.content).subscribe (x) =>
         meta = packet.meta
-        console.dir meta
         meta.sha256 = contentHash
         meta.createdAt = (new Date()).toISOString() unless prevHash
         meta.updatedAt = (new Date()).toISOString()
@@ -44,16 +43,24 @@ class Storage
 
           @rawDriver.readBlob(contentHash).subscribe (content) =>
             subscriber.onNext({type: 'content', content: content})
-          , (err) => onError(err)
+          , (err) => subscriber.onError(err)
 
           _write(@rawDriver, new File(uuid), writeObservable, subscriber, contentHash)
 
-        , (err) => onError(err)
-      , (err) => onError(err)
+        , (err) => subscriber.onError(err)
+      , (err) => subscriber.onError(err)
 
   getRecent: ->
-    # @rawDriver.getRecent().subscribe (uuids) ->
-    #   for uuid in uuids
+    Rx.Observable.create (subscriber) =>
+      @rawDriver.getRecent().subscribe (uuids) =>
+        cnt = uuids.length
+        for uuid in uuids
+          @rawDriver.readPointer(uuid).subscribe (metaHash) =>
+            @rawDriver.readBlob(metaHash).subscribe (metaMsgpack) =>
+              meta = msgpack.unpack(metaMsgpack)
+              subscriber.onNext(meta)
+              cnt--
+              subscriber.onCompleted() if cnt == 0
 
 
 module.exports = Storage

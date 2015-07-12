@@ -162,6 +162,8 @@ describe 'Storage', ->
       clock.restore()
 
   describe '#getRecent', ->
+    meta1 = {title: 'hoge'}
+    meta2 = {title: 'fuga'}
     dummyFunc = -> null
     dummyRawDriver = {getRecent: dummyFunc, readPointer: dummyFunc, readBlob: dummyFunc}
     stubGetRecent = sinon.stub(dummyRawDriver, 'getRecent')
@@ -170,12 +172,15 @@ describe 'Storage', ->
     stubReadPointer.withArgs('1111').returns(Rx.Observable.just('3333'))
     stubReadPointer.withArgs('2222').returns(Rx.Observable.just('4444'))
     stubReadBlob = sinon.stub(dummyRawDriver, 'readBlob')
-    stubReadBlob.withArgs('3333').returns(Rx.Observable.just())
+    stubReadBlob.withArgs('3333').returns(Rx.Observable.just(msgpack.pack(meta1)))
+    stubReadBlob.withArgs('4444').returns(Rx.Observable.just(msgpack.pack(meta2)))
 
+    storage = new Storage(dummyRawDriver)
+    storage.getRecent().subscribe (x) ->
+      assert x.title == 'hoge' || x.title == 'fuga'
 
-
-    # storage = new Storage(dummyRawDriver)
-    # storage.getRecent().subscribe (x) ->
-    #   console.dir x
+    assert stubGetRecent.calledOnce
+    assert stubReadPointer.calledTwice
+    assert stubReadBlob.calledTwice
 
 
