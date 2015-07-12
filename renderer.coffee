@@ -1,7 +1,9 @@
 marked = require 'marked'
 ipc = require 'ipc'
 
-repository = require './src/repository.coffee'
+Storage = require './src/storage.coffee'
+RawDriver = require './src/raw_driver.coffee'
+Rxfs = require './src/rxfs.coffee'
 
 class MainViewModel
   constructor: ->
@@ -12,19 +14,54 @@ class MainViewModel
       marked(editor)
     ).toProperty()
     @recent = wx.list()
+    @save = wx.property false
 
 class MainModel
   constructor: (viewModel, uuid) ->
     @viewModel = viewModel
+    @meta = {}
+    @content = ''
 
-    repository = new Repository()
+    conf = {
+      basePath: '/Users/erukiti/.cerebrums'
+    }
+    storage = new Storage(new RawDriver(new Rxfs(), conf))
 
-    obs = uuid ? repository.openUUID(uuid) : repository.createUUID()
-    obs.subscribe (packet) ->
+    _save = Rx.Observable.create (obs) =>
+      @viewModel.title.changed.subscribe (title) =>
+        @meta['title'] = title
+        @viewModel.save(false)
+
+        obs.onNext
+          type: 'change'
+          meta: @meta
+          content: @content
+
+      @viewModel.editor.changed.subscribe (text) =>
+        @content = text
+        @viewModel.save(false)
+
+        obs.onNext
+          type: 'change'
+          meta: @meta
+          content: @content
+
+      @viewModel.save.changed.filter((b) => b).subscribe () =>
+        obs.onNext
+          type: 'save'
+          meta: @meta
+          content: @content
+
+    # Rx.Observable.fromEvent(document.querySelector('#editor'), 'keyPress').subscribe (ev) ->
+    #   console.dir ev
+
+    obs = if uuid
+      storage.open(uuid, _save)
+    else
+      storage.create(_save)
+
+    obs.subscribe (packet) =>
       switch packet.type
-        when 'UUID'
-          @uuid = packet.uuid
-          _startSave(@uuid)
         when 'meta'
           @meta = packet.meta
           @viewModel.title = @meta.title
@@ -32,32 +69,9 @@ class MainModel
           @content = packet.content
           @viewModel.editor = @content
 
-    repository.getRecent().subscribe (lists) ->
-      @viewModel.recent.clear()
-      lists.each (meta) ->
-        @viewModel.recent.push meta
-
-    _startSave = (uuid) ->
-      packet = Rx.Observable.merge(
-        @viewModel.title.changed.map (title) ->
-          @meta.title = title
-          {
-            type: 'change'
-            uuid: @uuid
-            meta: @meta
-            content: @content
-          }
-        , @viewModel.editor.changed.map (text) ->
-          @content = text
-          {
-            type: 'change'
-            uuid: @uuid
-            meta: @meta
-            content: @content
-          }
-        # , Rx.Observable.fromEvent(document.querySelector('#editor'), 'keyPress').
-      )
-      repository.save(uuid, packet)
+    @viewModel.recent.clear()
+    storage.getRecent().subscribe (meta) =>
+      @viewModel.recent.push meta
 
 mainViewModel = new MainViewModel()
 mainModel = new MainModel(mainViewModel)
@@ -66,4 +80,7 @@ wx.applyBindings(mainViewModel)
 
 ipc.on 'message', (ev, arg)->
   switch ev
-    when 'open' then mainViewModel.is_editor(false)
+    when 'open'
+      mainViewModel.is_editor(false)
+    when 'save'
+      mainViewModel.save(true)

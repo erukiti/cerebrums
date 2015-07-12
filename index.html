@@ -6,15 +6,26 @@
 
   <body>
     <div class="main">
-      <div id="pane1">
+      <div id="pane1" data-bind="if: is_editor">
         <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
         <textarea class="editor" data-bind="textinput: @editor"></textarea>
       </div>
-      <div id="pane2">
+      <div id="pane2" data-bind="ifnot: is_editor">
         <div class="viewer" data-bind="html: viewer"></div>
       </div>
     </div>
 	  <script>
+      window.onerror = function(message, file, line, column, err) {
+        console.dir(err.stack);
+      }
+      // Error.prepareStackTrace = function(e, st) {
+      //   return {};
+      //   return {
+      //     functionName: st[0].getFunctionName(),
+      //     lineNumber: st[0].getLineNumber(),
+      //   };
+      // }
+
       Rx = require('rx')
       wx = require('./node_modules/webrx/dist/web.rx')
 
