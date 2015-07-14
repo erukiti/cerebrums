@@ -1,3 +1,10 @@
+Phase.2
+=======
+
+* 一通りの access view を実装する
+* application の描画を整える
+
+
 
 
 core
@@ -19,11 +26,11 @@ application
 	* [ ] view を独立したコンポーネントにする
 * layout
     * [ ] split bar
-        * [ ] 移動可能にする
+        * [ ] barを動かせるようにする
     * [ ] pane を動的に構成する
 	* [ ] layout manager
 		* [ ] 縦
-		* [ ] 横 (main)
+		* [ ] 横
 * [ ] ステータスバー
 * [ ] tab キーの挙動を変える
 * [ ] 初期フォーカスをタイトルにする
