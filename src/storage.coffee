@@ -18,6 +18,7 @@ class Storage
         meta.createdAt = (new Date()).toISOString() unless prevHash
         meta.updatedAt = (new Date()).toISOString()
         meta.prevSha256 = prevHash if prevHash
+        meta.uuid = uuid
         metaMsgpack = msgpack.encode(meta)
         metaHash = sha256(metaMsgpack)
         rawDriver.writeBlob(metaHash, metaMsgpack).subscribe((x) =>

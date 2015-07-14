@@ -5,15 +5,29 @@ require('crash-reporter').start();
 Menu = require 'menu'
 ipc = require 'ipc'
 
+windows = []
+
 app.on 'window-all-closed', ->
   app.quit()
 
-app.on 'ready', ->
-  mainWindow = new BrowserWindow {width: 800, height: 600}
-  mainWindow.loadUrl "file://#{__dirname}/index.html"
+ipc.on 'open', (ev, uuid) ->
+  win = new BrowserWindow {width: 800, height: 600}
+  win.loadUrl "file://#{__dirname}/index.html?uuid=#{encodeURIComponent(uuid)}"
 
-  mainWindow.on 'closed', ->
+  win.on 'closed', ->
+    console.log 'closed'
+
+  windows.push win
+  
+
+app.on 'ready', ->
+  win = new BrowserWindow {width: 800, height: 600}
+  win.loadUrl "file://#{__dirname}/index.html"
+
+  win.on 'closed', ->
     mainWindow = null;
+
+  windows.push win
 
   menuTemplate = [
     {
@@ -24,6 +38,12 @@ app.on 'ready', ->
           accelerator: 'Command+Q'
           click: ->
             app.quit()
+        },
+        {
+          label: 'Debug'
+          accelerator: 'Command+Alt+I'
+          click: ->
+            BrowserWindow.getFocusedWindow().toggleDevTools()
         }
       ]
     },
@@ -34,13 +54,13 @@ app.on 'ready', ->
           label: 'Open'
           accelerator: 'Command+O'
           click: ->
-            mainWindow.webContents.send 'message', 'open'
+            BrowserWindow.getFocusedWindow().webContents.send 'message', 'open'
         },
         {
           label: 'Save'
           accelerator: 'Command+S'
           click: ->
-            mainWindow.webContents.send 'message', 'save'
+            BrowserWindow.getFocusedWindow().webContents.send 'message', 'save'
         }
       ]
     }

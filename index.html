@@ -6,12 +6,23 @@
 
   <body>
     <div class="main">
-      <div id="pane1" data-bind="if: is_editor">
-        <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
-        <textarea class="editor" data-bind="textinput: @editor"></textarea>
+      <div id="pane1">
+        <div  data-bind="if: is_editor">
+          <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
+          <textarea class="editor" data-bind="textinput: @editor"></textarea>
+        </div>
+        <div data-bind="ifnot: is_editor">
+          <table>
+            <tbody data-bind="foreach: recent">
+              <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
+                <td data-bind="text: title"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div id="pane2" data-bind="ifnot: is_editor">
-        <div class="viewer" data-bind="html: viewer"></div>
+      <div id="pane2">
+        <div id="viewer" data-bind="html: viewer"></div>
       </div>
     </div>
 	  <script>

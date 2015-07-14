@@ -5,6 +5,10 @@ Storage = require './src/storage.coffee'
 RawDriver = require './src/raw_driver.coffee'
 Rxfs = require './src/rxfs.coffee'
 
+matched = location.search.match(/uuid=([^&]*)/)
+uuid = matched && decodeURIComponent(matched[1])
+console.dir uuid
+
 class MainViewModel
   constructor: ->
     @is_editor = wx.property true
@@ -14,7 +18,9 @@ class MainViewModel
       marked(editor)
     ).toProperty()
     @recent = wx.list()
-    @save = wx.property false
+    @save = wx.property true
+    @open = wx.command (param) ->
+      ipc.send('open', param.uuid)
 
 class MainModel
   constructor: (viewModel, uuid) ->
@@ -52,9 +58,6 @@ class MainModel
           meta: @meta
           content: @content
 
-    # Rx.Observable.fromEvent(document.querySelector('#editor'), 'keyPress').subscribe (ev) ->
-    #   console.dir ev
-
     obs = if uuid
       storage.open(uuid, _save)
     else
@@ -63,24 +66,29 @@ class MainModel
     obs.subscribe (packet) =>
       switch packet.type
         when 'meta'
-          @meta = packet.meta
-          @viewModel.title = @meta.title
+          @meta = packet
+          delete @meta['type']
+          @viewModel.title(@meta.title)
         when 'content'
-          @content = packet.content
-          @viewModel.editor = @content
+          @content = packet.content.toString()
+          @viewModel.editor(@content)
 
     @viewModel.recent.clear()
     storage.getRecent().subscribe (meta) =>
+      console.dir meta
       @viewModel.recent.push meta
 
 mainViewModel = new MainViewModel()
-mainModel = new MainModel(mainViewModel)
+mainModel = new MainModel(mainViewModel, uuid)
 
 wx.applyBindings(mainViewModel)
 
 ipc.on 'message', (ev, arg)->
   switch ev
     when 'open'
-      mainViewModel.is_editor(false)
+      if mainViewModel.is_editor()
+        mainViewModel.is_editor(false)
+      else
+        mainViewModel.is_editor(true)
     when 'save'
       mainViewModel.save(true)
