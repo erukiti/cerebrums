@@ -7,22 +7,22 @@ class RawDriver
 
   writeBlob: (hash, file) =>
     path = "#{@conf.basePath}/blob/#{hash}"
-    console.log "writeBlob: #{path}"
+    # console.log "writeBlob: #{path}"
     @rxfs.writeFile(path, file)
 
   writePointer: (uuid, file) =>
     path = "#{@conf.basePath}/pointer/#{uuid}"
-    console.log "writePointer: #{path}"
+    # console.log "writePointer: #{path}"
     @rxfs.writeFile(path, file)
 
   readBlob: (hash) =>
     path = "#{@conf.basePath}/blob/#{hash}"
-    console.log "readBlob: #{path}"
+    # console.log "readBlob: #{path}"
     @rxfs.readFile(path)
 
   readPointer: (uuid) =>
     path = "#{@conf.basePath}/pointer/#{uuid}"
-    console.log "readPointer: #{path}"
+    # console.log "readPointer: #{path}"
     @rxfs.readFile(path)
 
   getRecent: =>

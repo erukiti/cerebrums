@@ -36,8 +36,8 @@ describe 'RawDriver', ->
   it '#readBlob', ->
     dummyObservable = {}
 
-    rxfs = {readfile: -> null}
-    stub = sinon.stub(rxfs, 'readfile')
+    rxfs = {readFile: -> null}
+    stub = sinon.stub(rxfs, 'readFile')
     stub.withArgs('/path/blob/1234').returns(dummyObservable)
 
     rawDriver = new RawDriver(rxfs, {basePath: '/path'})
@@ -48,8 +48,8 @@ describe 'RawDriver', ->
   it '#readPointer', ->
     dummyObservable = {}
 
-    rxfs = {readfile: -> null}
-    stub = sinon.stub(rxfs, 'readfile')
+    rxfs = {readFile: -> null}
+    stub = sinon.stub(rxfs, 'readFile')
     stub.withArgs("/path/pointer/1234").returns(dummyObservable)
 
     rawDriver = new RawDriver(rxfs, {basePath: '/path'})
@@ -60,8 +60,8 @@ describe 'RawDriver', ->
   it '#getRecent', ->
     dummyObservable = {}
     dummyFunc = -> null
-    rxfs = {readdir: dummyFunc}
-    stubReaddir = sinon.stub(rxfs, 'readdir')
+    rxfs = {readDir: dummyFunc}
+    stubReaddir = sinon.stub(rxfs, 'readDir')
     stubReaddir.withArgs('/path/pointer').returns(Rx.Observable.just(['/path/pointer/1111']))
 
     rawDriver = new RawDriver(rxfs, {basePath: '/path'})
