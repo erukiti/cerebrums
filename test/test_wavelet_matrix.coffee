@@ -6,31 +6,67 @@ WaveletMatrix = require '../src/wavelet_matrix.coffee'
 describe 'WaveletMatrix', ->
   describe '#rank', ->
     it '', ->
-      wm = new WaveletMatrix([11, 0, 15, 6, 5, 2, 7, 12, 11, 0, 12, 12, 13, 4, 6, 13, 1, 11, 6, 1, 7, 10, 2, 7, 14, 11, 1, 7, 5, 4, 14, 6])
+      wm = new WaveletMatrix([11, 0, 15, 6, 5, 2, 7, 12, 11, 0, 12, 12, 13, 4, 6, 13, 1, 11, 6, 1, 7, 10,     2, 7, 14, 11, 1, 7, 5, 4, 14, 6])
       assert wm.rank(0, 11) == 0
       assert wm.rank(1, 11) == 1
+      assert wm.rankLessThan(1, 11) == 0
+      assert wm.rankGreaterThan(1, 11) == 0
 
-      assert wm.rank(22, 11) == 3
-      assert wm.rank(26, 11) == 4
-      assert wm.rank(25, 11) == 3
       assert wm.rank(22 ,0) == 2
-      assert wm.rank(22, 15) == 1
-      assert wm.rank(22, 6) == 3
-      assert wm.rank(22, 5) == 1
+      assert wm.rank(22, 1) == 2
       assert wm.rank(22, 2) == 1
+      assert wm.rank(22, 3) == 0
+      assert wm.rank(22, 4) == 1
+      assert wm.rank(22, 5) == 1
+      assert wm.rank(22, 6) == 3
       assert wm.rank(22, 7) == 2
+      assert wm.rank(22, 8) == 0
+      assert wm.rank(22, 9) == 0
+      assert wm.rank(22, 10) == 1
+      assert wm.rank(22, 11) == 3
       assert wm.rank(22, 12) == 3
       assert wm.rank(22, 13) == 2
-      assert wm.rank(22, 4) == 1
-      assert wm.rank(22, 3) == 0
+      assert wm.rank(22, 15) == 1
+
+      assert wm.rankLessThan(22, 0) == 0
+      assert wm.rankLessThan(22, 1) == 2
+      assert wm.rankLessThan(22, 2) == 4
+      assert wm.rankLessThan(22, 3) == 5
+      assert wm.rankLessThan(22, 4) == 5
+      assert wm.rankLessThan(22, 5) == 6
+      assert wm.rankLessThan(22, 6) == 7
+      assert wm.rankLessThan(22, 7) == 10
+      assert wm.rankLessThan(22, 8) == 12
+      assert wm.rankLessThan(22, 9) == 12
+      assert wm.rankLessThan(22, 10) == 12
+      assert wm.rankLessThan(22, 11) == 13
+      assert wm.rankLessThan(22, 12) == 16
+      assert wm.rankLessThan(22, 13) == 19
+      assert wm.rankLessThan(22, 15) == 21
+
+      assert wm.rank(25, 11) == 3
+
+      assert wm.rank(26, 11) == 4
 
     it '', ->
-      wm = new WaveletMatrix('abbracadabbra')
+      wm = new WaveletMatrix('abbracad abbra')
       assert wm.rank(0, 'a') == 0
+
       assert wm.rank(1, 'a') == 1
+
       assert wm.rank(8, 'a') == 3
       assert wm.rank(8, 'b') == 2
+      assert wm.rank(8, 'c') == 1
+      assert wm.rank(8, 'd') == 1
       assert wm.rank(8, 'r') == 1
+
+      assert wm.rankLessThan(8, 'a') == 0
+      assert wm.rankLessThan(8, 'b') == 3
+      assert wm.rankLessThan(8, 'c') == 5
+      assert wm.rankLessThan(8, 'd') == 6
+      assert wm.rankLessThan(8, 'e') == 7
+      assert wm.rankLessThan(8, 'r') == 7
+      assert wm.rankLessThan(8, 's') == 8
 
   describe '#get', ->
     it '', ->

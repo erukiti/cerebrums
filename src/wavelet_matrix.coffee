@@ -68,32 +68,73 @@ class WaveletMatrix
     # for n in @c0size
     #   console.log n
 
-  rank: (ind, c) ->
-    return 0 if ind == 0
+  _rank: (start, ind, c) ->
+    return {equal: 0, great: 0, less: 0} if ind == 0
     if typeof c == 'string'
       c = c.charCodeAt(0)
-
-    return 0 if @starts[c] == undefined
 
     # c が bits の範囲かどうかチェック
     bits = @bits
 
     cnt = 0
+    great = 0
+    less = 0
     bitmask = 1 << (bits - 1)
     while bitmask > 0
-      # console.log "#{c & bitmask}, #{ind}"
+      # console.log "loop #{c & bitmask}, #{ind}"
       if c & bitmask
+        size = ind - start
+        start = @c0size[cnt] + @bitStreams[cnt].rank1(start)
         ind = @c0size[cnt] + @bitStreams[cnt].rank1(ind)
+        less += size - (ind - start)
+        # console.log "less += #{size - (ind - start)}"
       else
+        size = ind - start
+        start = @bitStreams[cnt].rank0(start)
         ind = @bitStreams[cnt].rank0(ind)
+        great += size - (ind - start)
+        # console.log "great += #{size - (ind - start)}"
+      # console.log "ind #{ind}"
       cnt++
       bitmask >>>= 1
       # console.log ind
       # return 0 if ind == 0
+#  v
+# 11010101
+# ...*****
+
+
+    # console.log "great: #{great}"
+    # console.log "less: #{less}"
 
     # console.log "#{c}, #{@starts[c]}, #{ind}"
+    # if @starts[c] != undefined
+    #   {
+    #     'equal': ind - @starts[c]
+    #     'great': great
+    #     'less': less
+    #   }
+    # else
+    #   {
+    #     'equal': 0
+    #     'great': great
+    #     'less': less
+    #   }
 
-    ind - @starts[c]
+    {
+      equal: ind - start
+      great: great
+      less: less
+    }
+
+  rank: (ind, c) ->
+    @_rank(0, ind, c)['equal']
+
+  rankLessThan: (ind, c) ->
+    @_rank(0, ind, c)['less']
+  
+  rankGreaterThan: (ind, c) ->
+    @_rank(0, ind, c)['great']
 
 # select: () ->
 

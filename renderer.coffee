@@ -9,6 +9,8 @@ matched = location.search.match(/uuid=([^&]*)/)
 uuid = matched && decodeURIComponent(matched[1])
 console.dir uuid
 
+console.dir document.querySelector('body')
+
 class MainViewModel
   constructor: ->
     @is_editor = wx.property true
