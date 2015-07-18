@@ -109,5 +109,10 @@ describe 'WaveletMatrix', ->
       assert wm.select(1, 12) == 10
       assert wm.select(2, 12) == 11
 
+
     it '', ->
       wm = new WaveletMatrix('abbracadabbra')
+      assert wm.select(0, 'a') == 0
+      assert wm.select(0, 'b') == 1
+      assert wm.select(0, 'r') == 3
+
