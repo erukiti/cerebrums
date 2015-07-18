@@ -98,3 +98,16 @@ describe 'WaveletMatrix', ->
       assert wm.get(10) == 'b'.charCodeAt(0)
       assert wm.get(11) == 'r'.charCodeAt(0)
       assert wm.get(12) == 'a'.charCodeAt(0)
+
+  describe '#select', ->
+    it '', ->
+      wm = new WaveletMatrix([11, 0, 15, 6, 5, 2, 7, 12, 11, 0, 12, 12, 13, 4, 6, 13, 1, 11, 6, 1, 7, 10, 2, 7, 14, 11, 1, 7, 5, 4, 14, 6])
+      assert wm.select(0, 11) == 0
+      assert wm.select(0, 0) == 1
+      assert wm.select(0, 12) == 7
+
+      assert wm.select(1, 12) == 10
+      assert wm.select(2, 12) == 11
+
+    it '', ->
+      wm = new WaveletMatrix('abbracadabbra')

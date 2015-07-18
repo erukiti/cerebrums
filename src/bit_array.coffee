@@ -183,6 +183,9 @@ class BitArray
 
   select: (ind, bit) ->
     # console.log "select #{ind}, #{bit}"
+    throw new Error "index #{ind} is error." if ind < 0
+
+
     left = 0
     right = Math.floor(@size / 8 / 64)
     if left == right

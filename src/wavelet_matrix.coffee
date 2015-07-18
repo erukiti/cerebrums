@@ -70,8 +70,8 @@ class WaveletMatrix
 
   _rank: (start, ind, c) ->
     return {equal: 0, great: 0, less: 0} if ind == 0
-    if typeof c == 'string'
-      c = c.charCodeAt(0)
+    
+    c = c.charCodeAt(0) if typeof c == 'string'
 
     # c が bits の範囲かどうかチェック
     bits = @bits
@@ -136,7 +136,26 @@ class WaveletMatrix
   rankGreaterThan: (ind, c) ->
     @_rank(0, ind, c)['great']
 
-# select: () ->
+  select: (ind, c) ->
+    # console.log "select(#{ind},#{c})"
+    c = c.charCodeAt(0) if typeof c == 'string'
+
+    throw new Error("not found #{c}") if @starts[c] == undefined
+
+    # c が bits の範囲かどうかチェック
+
+    cnt = @bits - 1
+    bitmask = 1
+    ind = @starts[c] + ind
+    while cnt >= 0
+      # console.log "loop #{c & bitmask}, #{ind} #{@c0size[cnt]}"
+      if c & bitmask
+        ind = @bitStreams[cnt].select1(ind - @c0size[cnt] + 1)
+      else
+        ind = @bitStreams[cnt].select0(ind + 1)
+      cnt--
+      bitmask <<= 1
+    ind
 
   get: (ind) ->
     bits = @bits
@@ -153,5 +172,6 @@ class WaveletMatrix
       bitmask >>>= 1
 
     c
+
 
 module.exports = WaveletMatrix

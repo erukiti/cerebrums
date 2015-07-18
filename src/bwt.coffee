@@ -1,3 +1,5 @@
+WaveletMatrix = require './wavelet_matrix.coffee'
+
 class BWT
   encode: (s) ->
     ary = [0..s.length].sort (a, b) =>
@@ -18,5 +20,11 @@ class BWT
         result += s[a - 1]
 
     result
+
+  decode: (s) ->
+    wm = new WaveletMatrix(s)
+    lf = (wm, ind, c) =>
+      wm.rank(ind, c) + wm.rankLessThan(s.length, c)
+    ind = wm.select()
 
 module.exports = BWT
