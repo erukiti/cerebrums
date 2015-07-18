@@ -49,7 +49,7 @@ describe 'WaveletMatrix', ->
       assert wm.rank(26, 11) == 4
 
     it '', ->
-      wm = new WaveletMatrix('abbracad abbra')
+      wm = new WaveletMatrix('abbracadabbra')
       assert wm.rank(0, 'a') == 0
 
       assert wm.rank(1, 'a') == 1

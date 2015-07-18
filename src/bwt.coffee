@@ -1,6 +1,9 @@
 WaveletMatrix = require './wavelet_matrix.coffee'
 
 class BWT
+  lf = (wm, ind, c, length) =>
+    wm.rank(ind, c) + wm.rankLessThan(length, c)
+
   @encode = (s) ->
     ary = [0..s.length].sort (a, b) =>
        while true
@@ -28,8 +31,6 @@ class BWT
     }
 
   @decode = (s, last) ->
-    lf = (wm, ind, c) =>
-      wm.rank(ind, c) + wm.rankLessThan(s.length, c)
 
     # console.log "decode: #{s}"
 
@@ -39,10 +40,32 @@ class BWT
     i = 0
     while i < s.length
       # console.log "loop: #{ind} #{lf(wm, ind, s[ind])}"
-      ind = lf(wm, ind, s[ind])
+      ind = lf(wm, ind, s[ind], s.length)
       result = "#{s[ind]}#{result}"
       i++
 
     result
+
+  @search = (s, q) ->
+    console.log "search: #{q}"
+
+    wm = new WaveletMatrix(s)
+    start = 0
+    end = s.length
+
+    i = q.length - 1
+    while i >= 0
+      c = q[i]
+      start = lf(wm, start, c, s.length)
+      end = lf(wm, end, c, s.length)
+      return [] if start >= end
+      i--
+
+    for ind in [start...end]
+      pos = 0
+      while s[ind] != '$'
+        ind = lf(wm, ind, s[ind], s.length)
+        pos++
+      pos
 
 module.exports = BWT
