@@ -5,13 +5,15 @@
   <link rel="stylesheet" href="./app.css">
 
   <body>
-    <div class="main">
+    <div id="main">
+      <div id="tabs1">tabs</div>
+      <div id="tabs2">tabs</div>
       <div id="pane1">
-        <div  data-bind="if: is_editor" style="height: 100%">
-          <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
-          <textarea class="editor" data-bind="textinput: @editor"></textarea>
+        <div  data-bind="visible: is_editor">
+          <input type="text" class="titleEditor" id="titleEditor1" data-bind="textinput: @title" placeholder="タイトル">
+          <textarea class="editor" id="editor1" data-bind="textinput: @editor"></textarea>
         </div>
-        <div data-bind="ifnot: is_editor" style="height:100%">
+        <div data-bind="visible: !is_editor">
           <table>
             <tbody data-bind="foreach: recent">
               <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
@@ -25,6 +27,7 @@
         <div id="viewer" data-bind="html: viewer"></div>
       </div>
     </div>
+    <div id="statusbar" data-bind="text: status">hoge</div>
 	  <script>
       window.onerror = function(message, file, line, column, err) {
         console.dir(err.stack);

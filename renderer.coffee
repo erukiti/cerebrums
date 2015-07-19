@@ -7,9 +7,25 @@ Rxfs = require './src/rxfs.coffee'
 
 matched = location.search.match(/uuid=([^&]*)/)
 uuid = matched && decodeURIComponent(matched[1])
-console.dir uuid
 
-console.dir document.querySelector('body')
+layout = ->
+  statusbar = document.getElementById 'statusbar'
+  main = document.getElementById 'main'
+  pane1 = document.getElementById 'pane1'
+  pane2 = document.getElementById 'pane2'
+  tabs1 = document.getElementById 'tabs1'
+  tabs2 = document.getElementById 'tabs2'
+  titleEditor1 = document.getElementById 'titleEditor1'
+  editor1 = document.getElementById 'editor1'
+
+  main.style.height = "#{window.innerHeight - statusbar.offsetHeight}px"
+
+  pane1.style.height = "#{main.offsetHeight - tabs1.offsetHeight}px"
+  pane2.style.height = "#{main.offsetHeight - tabs2.offsetHeight}px"
+
+  editor1.style.height = "#{pane1.offsetHeight - titleEditor1.offsetHeight}px"
+
+layout()
 
 class MainViewModel
   constructor: ->
@@ -19,6 +35,7 @@ class MainViewModel
     @viewer = wx.whenAny(this.editor, (editor) ->
       marked(editor)
     ).toProperty()
+    @status = wx.property 'status'
     @recent = wx.list()
     @save = wx.property true
     @open = wx.command (param) ->

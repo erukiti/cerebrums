@@ -18,4 +18,4 @@ describe 'BWT', ->
     # assert BWT.decode('bcdeaaaa', 4) == 'aeadacab'
 
   describe '.search', ->
-    console.dir BWT.search('ard$rcaaaabb', 'bra')
+    assert BWT.search('ard$rcaaaabb', 'bra').sort(), [1, 8]

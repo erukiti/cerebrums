@@ -22,6 +22,7 @@
   padding: 10px;
   border-bottom: 1px solid #ddd;
   font-size: 1.5em;
+  line-height: 1.5em;
 }
 
 .editor {
@@ -93,26 +94,40 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-.main{
-  position: absolute;
+#main{
   width: 100%;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
 }
 div {
   display: block;
 }
 
 #pane1 {
-  height: 100%;
   width: 50%;
+  height: 100%;
   float: left;
 }
 
 #pane2 {
-  height: 100%;
   width: 50%;
+  height: 100%;
   float: left;
+}
+
+#tabs1 {
+  width: 50%;
+  line-height: 1.5em;
+  float: left;
+}
+
+#tabs2 {
+  width: 50%;
+  line-height: 1.5em;
+  float: left;
+}
+
+#statusbar {
+  line-height: 1em;
+  background-color: #ffff00;
+  width: 100%;
+  clear: both;
 }
