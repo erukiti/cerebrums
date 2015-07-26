@@ -11,7 +11,7 @@
       <div id="pane1">
         <div  data-bind="visible: is_editor">
           <input type="text" class="titleEditor" id="titleEditor1" data-bind="textinput: @title" placeholder="タイトル">
-          <textarea class="editor" id="editor1" data-bind="textinput: @editor"></textarea>
+          <textarea class="editor" id="editor1" data-bind="textinput: @editor, event: {keydown: pressKey}"></textarea>
         </div>
         <div data-bind="visible: !is_editor">
           <table>

@@ -42,6 +42,16 @@ class MainViewModel
     @save = wx.property true
     @open = wx.command (param) ->
       ipc.send('open', param.uuid)
+    @pressKey = (a, ev) ->
+      if ev.keyCode == 9
+        obj = document.getElementById('editor1')
+        sPos = obj.selectionStart
+        ePos = obj.selectionEnd
+        @editor("#{@editor().substr(0, sPos)}\t#{@editor().substr(ePos)}")
+        obj.setSelectionRange(sPos + 1, sPos + 1)
+        ev.preventDefault()
+
+
 
 class MainModel
   constructor: (viewModel, uuid) ->
