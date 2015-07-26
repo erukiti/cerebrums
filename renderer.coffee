@@ -8,6 +8,8 @@ Rxfs = require './src/rxfs.coffee'
 matched = location.search.match(/uuid=([^&]*)/)
 uuid = matched && decodeURIComponent(matched[1])
 
+document.getElementById('titleEditor1').focus()
+
 layout = ->
   statusbar = document.getElementById 'statusbar'
   main = document.getElementById 'main'
@@ -94,7 +96,7 @@ class MainModel
 
     @viewModel.recent.clear()
     storage.getRecent().subscribe (meta) =>
-      console.dir meta
+      # console.dir meta
       @viewModel.recent.push meta
 
 mainViewModel = new MainViewModel()
