@@ -4,11 +4,31 @@ ipc = require 'ipc'
 Storage = require './src/storage.coffee'
 RawDriver = require './src/raw_driver.coffee'
 Rxfs = require './src/rxfs.coffee'
+EditorViewModel = require './editor_view.coffee'
 
-matched = location.search.match(/uuid=([^&]*)/)
-uuid = matched && decodeURIComponent(matched[1])
+# matched = location.search.match(/uuid=([^&]*)/)
+# uuid = matched && decodeURIComponent(matched[1])
 
-document.getElementById('titleEditor1').focus()
+class MainViewModel
+  constructor: ->
+    @views = wx.list [new EditorViewModel(1), new EditorViewModel(2)]
+
+
+
+wx.app.component 'editor',
+  template: '
+<input type="text" class="titleEditor" id="titleEditor1" data-bind="textinput: @title" placeholder="タイトル">
+<textarea class="editor" id="editor1" data-bind="textinput: @text"></textarea>'
+
+wx.applyBindings(new MainViewModel())
+
+
+
+
+
+return
+
+# document.getElementById('titleEditor1').focus()
 
 layout = ->
   statusbar = document.getElementById 'statusbar'
@@ -18,26 +38,29 @@ layout = ->
   tabs1 = document.getElementById 'tabs1'
   tabs2 = document.getElementById 'tabs2'
   titleEditor1 = document.getElementById 'titleEditor1'
-  editor1 = document.getElementById 'editor1'
+  # editor1 = document.getElementById 'editor1'
 
   main.style.height = "#{window.innerHeight - statusbar.offsetHeight}px"
 
   pane1.style.height = "#{main.offsetHeight - tabs1.offsetHeight}px"
   pane2.style.height = "#{main.offsetHeight - tabs2.offsetHeight}px"
 
-  editor1.style.height = "#{pane1.offsetHeight - titleEditor1.offsetHeight}px"
+  # editor1.style.height = "#{pane1.offsetHeight - titleEditor1.offsetHeight}px"
 
 layout()
 
 class MainViewModel
   constructor: ->
+    @comp = new EditorViewModel()
+
     @tabs1_index = wx.property 1
     @tabs1 = wx.list([{tabTitle: 'エディタ', pane: 1}, {tabTitle: 'アクセス', pane: 2}])
     @title = wx.property ''
-    @editor = wx.property ''
-    @viewer = wx.whenAny(this.editor, (editor) ->
-      marked(editor)
-    ).toProperty()
+    # @editor = wx.property ''
+    @viewer = wx.property ''
+    # @viewer = wx.whenAny(this.editor, (editor) ->
+    #   marked(editor)
+    # ).toProperty()
     @status = wx.property 'status'
     @recent = wx.list()
     @save = wx.property true
@@ -75,14 +98,14 @@ class MainModel
           meta: @meta
           content: @content
 
-      @viewModel.editor.changed.subscribe (text) =>
-        @content = text
-        @viewModel.save(false)
+      # @viewModel.editor.changed.subscribe (text) =>
+      #   @content = text
+      #   @viewModel.save(false)
 
-        obs.onNext
-          type: 'change'
-          meta: @meta
-          content: @content
+      #   obs.onNext
+      #     type: 'change'
+      #     meta: @meta
+      #     content: @content
 
       @viewModel.save.changed.filter((b) => b).subscribe () =>
         obs.onNext
@@ -112,6 +135,10 @@ class MainModel
 
 mainViewModel = new MainViewModel()
 mainModel = new MainModel(mainViewModel, uuid)
+
+wx.app.component 'editor',
+  viewModel: {require: './editor_view.coffee'}
+  template: {require: './editor_view.html'}
 
 wx.applyBindings(mainViewModel)
 

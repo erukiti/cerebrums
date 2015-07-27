@@ -5,7 +5,14 @@
   <link rel="stylesheet" href="./app.css">
 
   <body>
-    <div id="main">
+      <ul data-bind="foreach: views">
+        <editor></editor>
+      </ul>
+
+
+
+
+<!--     <div id="main" data-bind="visible: false">
       <div id="tabs1" data-bind="foreach: tabs1">
         <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
       </div>
@@ -30,6 +37,7 @@
       </div>
     </div>
     <div id="statusbar" data-bind="text: status">hoge</div>
+ -->
 	  <script>
       window.onerror = function(message, file, line, column, err) {
         console.dir(err.stack);
