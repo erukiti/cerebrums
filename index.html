@@ -6,14 +6,16 @@
 
   <body>
     <div id="main">
-      <div id="tabs1">tabs</div>
-      <div id="tabs2">tabs</div>
+      <div id="tabs1" data-bind="foreach: tabs1">
+        <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
+      </div>
+      <div id="tabs2"><div class="tab" id="tab2-1">プレビュー</div></div>
       <div id="pane1">
-        <div  data-bind="visible: is_editor">
+        <div  data-bind="visible: tabs1_index == 1">
           <input type="text" class="titleEditor" id="titleEditor1" data-bind="textinput: @title" placeholder="タイトル">
           <textarea class="editor" id="editor1" data-bind="textinput: @editor, event: {keydown: pressKey}"></textarea>
         </div>
-        <div data-bind="visible: !is_editor">
+        <div data-bind="visible: tabs1_index == 2">
           <table>
             <tbody data-bind="foreach: recent">
               <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">

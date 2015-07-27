@@ -31,7 +31,8 @@ layout()
 
 class MainViewModel
   constructor: ->
-    @is_editor = wx.property true
+    @tabs1_index = wx.property 1
+    @tabs1 = wx.list([{tabTitle: 'エディタ', pane: 1}, {tabTitle: 'アクセス', pane: 2}])
     @title = wx.property ''
     @editor = wx.property ''
     @viewer = wx.whenAny(this.editor, (editor) ->
@@ -42,6 +43,8 @@ class MainViewModel
     @save = wx.property true
     @open = wx.command (param) ->
       ipc.send('open', param.uuid)
+    @tabChange = wx.command (data) =>
+      @tabs1_index(Number(data.pane))
     @pressKey = (a, ev) ->
       if ev.keyCode == 9
         obj = document.getElementById('editor1')
@@ -50,8 +53,6 @@ class MainViewModel
         @editor("#{@editor().substr(0, sPos)}\t#{@editor().substr(ePos)}")
         obj.setSelectionRange(sPos + 1, sPos + 1)
         ev.preventDefault()
-
-
 
 class MainModel
   constructor: (viewModel, uuid) ->
@@ -117,9 +118,9 @@ wx.applyBindings(mainViewModel)
 ipc.on 'message', (ev, arg)->
   switch ev
     when 'open'
-      if mainViewModel.is_editor()
-        mainViewModel.is_editor(false)
+      if mainViewModel.tab1() == 1
+        mainViewModel.tabs1_index(2)
       else
-        mainViewModel.is_editor(true)
+        mainViewModel.tabs1_index(1)
     when 'save'
       mainViewModel.save(true)

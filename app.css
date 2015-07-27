@@ -132,3 +132,7 @@ div {
   width: 100%;
   clear: both;
 }
+
+.tab {
+  display: inline;
+}
