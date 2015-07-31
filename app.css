@@ -84,6 +84,7 @@ body {
   line-height: 1.42857143;
   color: #4a4a4a;
   background-color: #fff;
+  height: 100%;
 }
 html {
   font-size: 10px;
@@ -95,37 +96,6 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-#main{
-  width: 100%;
-}
-div {
-  display: block;
-}
-
-#pane1 {
-  width: 50%;
-  height: 100%;
-  float: left;
-}
-
-#pane2 {
-  width: 50%;
-  height: 100%;
-  float: left;
-}
-
-#tabs1 {
-  width: 50%;
-  line-height: 1.5em;
-  float: left;
-}
-
-#tabs2 {
-  width: 50%;
-  line-height: 1.5em;
-  float: left;
-}
-
 #statusbar {
   line-height: 1em;
   background-color: #ffff00;
@@ -135,4 +105,7 @@ div {
 
 .tab {
   display: inline;
+}
+
+#panes {
 }

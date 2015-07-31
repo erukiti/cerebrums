@@ -4,15 +4,20 @@
   <title>Cerebrums</title>
   <link rel="stylesheet" href="./app.css">
 
-  <body>
-      <ul data-bind="foreach: views">
+<body>
+
+<!--       <ul data-bind="foreach: views">
         <editor></editor>
       </ul>
+ -->
 
+    <div data-bind="foreach: {data: panes, hooks: hooks}" id="panes">
+      <pane></pane>
+    </div>
+    <div id="statusbar" data-bind="text: status">hoge</div>
 
-
-
-<!--     <div id="main" data-bind="visible: false">
+<!-- 
+    <div id="main" data-bind="visible: false">
       <div id="tabs1" data-bind="foreach: tabs1">
         <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
       </div>
@@ -36,7 +41,6 @@
         <div id="viewer" data-bind="html: viewer"></div>
       </div>
     </div>
-    <div id="statusbar" data-bind="text: status">hoge</div>
  -->
 	  <script>
       window.onerror = function(message, file, line, column, err) {

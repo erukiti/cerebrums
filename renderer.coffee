@@ -4,25 +4,103 @@ ipc = require 'ipc'
 Storage = require './src/storage.coffee'
 RawDriver = require './src/raw_driver.coffee'
 Rxfs = require './src/rxfs.coffee'
-EditorViewModel = require './editor_view.coffee'
+EditorViewModel = require './editor_view_model.coffee'
 
 # matched = location.search.match(/uuid=([^&]*)/)
 # uuid = matched && decodeURIComponent(matched[1])
 
+class PaneViewModel
+  constructor: (params) ->
+    @tabs = wx.list()
+    @views = wx.list()
+    @tabIndex = wx.property 0
+
+  addView: (view) ->
+    n = @tabs.length()
+    @tabs.push {tabTitle: "tab#{n + 1}"}
+    @views.push view
+
+    @elemViews.children[n].id = "view#{n}"
+    view.setId n
+    view.setElement @elemViews.children[n]
+
+  setWidth: (width) ->
+    @width = width
+    @views.forEach (view) ->
+      view.setWidth width
+
+  setHeight: (height) ->
+    console.log height
+    @elem.style.height = "#{height}px"
+    @height = height
+    height -= @elemTabs.offsetHeight
+    @views.forEach (view) ->
+      view.setHeight height
+
+  setElement: (elem) ->
+    @elem = elem
+
+    if elem.children[0].className == 'tabs'
+      @elemTabs = elem.children[0]
+      @elemViews = elem.children[1]
+    else
+      @elemTabs = elem.children[1]
+      @elemViews = elem.children[0]
+
+
+
+  setId: (id) ->
+    @id = id
+
+
 class MainViewModel
   constructor: ->
-    @views = wx.list [new EditorViewModel(1), new EditorViewModel(2)]
+    @panes = wx.list()
+    @status = wx.property 'statusbar'
+
+    @panesElem = document.getElementById 'panes'
+    @statusBarElem = document.getElementById 'statusbar'
+    @id = wx.property 0
+
+  addPane: (pane) ->
+    @panes.push pane
+    n = @panesElem.children.length - 1
+    @panesElem.children[n].id = "pane#{n}"
+    pane.setId n
+    pane.setElement @panesElem.children[n]
+    # setHeight
+
+  setHeight: (height) ->
+    @panesElem.style.height = "#{height - @statusBarElem.offsetHeight}px"
+    @panes.forEach (pane) =>
+      pane.setHeight height - @statusBarElem.offsetHeight
 
 
+wx.app.component 'pane',
+  template: '
+<div class="tabs" data-bind="foreach: tabs">
+  <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
+</div>
+<div class="views" data-bind="foreach: views">
+  <div data-bind="visible: $index == $parent.tabIndex, html: html"></div>
+</div>
+'
 
 wx.app.component 'editor',
   template: '
-<input type="text" class="titleEditor" id="titleEditor1" data-bind="textinput: @title" placeholder="タイトル">
-<textarea class="editor" id="editor1" data-bind="textinput: @text"></textarea>'
+<input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
+<textarea class="editor" data-bind="textinput: @text"></textarea>'
 
-wx.applyBindings(new MainViewModel())
+editorViewModel = new EditorViewModel()
+paneViewModel = new PaneViewModel()
+mainViewModel = new MainViewModel()
 
+wx.applyBindings(mainViewModel)
 
+mainViewModel.addPane paneViewModel
+paneViewModel.addView editorViewModel
+
+mainViewModel.setHeight(window.innerHeight)
 
 
 
