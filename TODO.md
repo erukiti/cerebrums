@@ -34,6 +34,7 @@ application
 * [ ] ステータスバー
 	* [ ] エラーをステータスバーに表示する
 	* [ ] セーブした報告をステータスバーに表示する
+	* [ ] オープンしてるファイルの情報を表示する
 * [x] tab キーの挙動を変える
 * [ ] エディタの末尾でスペースやtabを入力しても駄目な現象の解明
 * [ ] カーソル上下で、タイトル・本文を移動できるようにする
@@ -57,12 +58,15 @@ application
 * [x] editorView -> previewView
 * [x] view から title を tab に反映
 * [ ] save を書き直す
-
+* [ ] editor tab を複数にできるようにする
+* [ ] window resize に対応する
+* [ ] access view を再度実装する
 
 * アプリケーション名変更
 * css
 	- [ ] preview 用
 * [ ] 絵文字対応
+* [ ] code highlight
 
 * [ ] システムダイアログ
 	- [ ] font-selector

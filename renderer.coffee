@@ -11,7 +11,7 @@ EditorViewModel = require './editor_view_model.coffee'
 
 class PreviewViewModel
   constructor: ->
-    @html = wx.property '<div class="pewview" data-bind="html: renderedHtml"></div>'
+    @html = wx.property '<div class="preview" data-bind="html: renderedHtml"></div>'
     @renderedHtml = wx.property ''
 
   setHeight: (height) ->
@@ -32,17 +32,45 @@ class PreviewViewModel
   titleObservable: ->
     Rx.Observable.just('preview')
 
+class AccessViewModel
+  constructor: ->
+    @html = wx.property '<access></access>'
+
+  setHeight: (height) ->
+    @elem.style.height = "#{height}px"
+
+  setWidth: (width) ->
+    @elem.style.width = "#{width}px"
+
+  setElement: (elem) ->
+    @elem = elem
+
+  setId: (id) ->
+    @id = id
+
+  previewObservable: ->
+    # FIXME: preview に対応する
+    Rx.Observable.empty()
+
+  titleObservable: ->
+    Rx.Observable.just('access')
+
 class PaneViewModel
   constructor: (params) ->
     @tabs = wx.list()
     @views = wx.list()
-    @tabIndex = wx.property 0
+    @tabView = wx.property null
+    @tabChange = wx.command (tab) =>
+      console.dir tab
+      @tabView(tab.view)
 
   addView: (view) ->
     n = @tabs.length()
-    tab = {tabTitle: wx.property ''}
+    tab = {tabTitle: wx.property(''), view: view}
+
     @tabs.push tab
     @views.push view
+    @tabView(view) if @tabView() == null
 
     @elemViews.children[n].id = "view#{n}"
     view.setId n
@@ -94,7 +122,7 @@ class PaneViewModel
     @id = id
 
   getView: ->
-    @views.get(@tabIndex())
+    @tabView()
 
 class MainViewModel
   constructor: (nPanes) ->
@@ -141,14 +169,26 @@ wx.app.component 'pane',
   <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
 </div>
 <div class="views" data-bind="foreach: views">
-  <div data-bind="visible: $index == $parent.tabIndex, html: html"></div>
+  <div data-bind="visible: $data == $parent.tabView, html: html"></div>
 </div>
 '
 
 wx.app.component 'editor',
   template: '
 <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
-<textarea class="editor" data-bind="textinput: @text"></textarea>'
+<textarea class="editor" data-bind="textinput: @text"></textarea>
+'
+
+wx.app.component 'access',
+  template: '
+<table>
+  <tbody data-bind="foreach: recent">
+    <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
+      <td data-bind="text: title"></td>
+    </tr>
+  </tbody>
+</table>
+'
 
 mainViewModel = new MainViewModel(0)
 
@@ -157,6 +197,7 @@ wx.applyBindings(mainViewModel)
 mainViewModel.addPane()
 mainViewModel.addPane()
 mainViewModel.addView(new EditorViewModel(), 0)
+mainViewModel.addView(new AccessViewModel(), 0)
 mainViewModel.addView(new PreviewViewModel(), 1)
 
 mainViewModel.getView(0).previewObservable().subscribe (html) ->
