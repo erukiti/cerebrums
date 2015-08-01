@@ -1,11 +1,50 @@
 marked = require 'marked'
+remote = require 'remote'
 
 class EditorViewModel
-  constructor: (param) ->
+  constructor: (uuid) ->
     @title = wx.property ''
     @text = wx.property ''
     @isDirty = wx.property false
     @html = wx.property '<editor></editor>'
+
+    @meta = {}
+    @content = ''
+
+    # _save = Rx.Observable.create (obs) =>
+    #   @title.changed.subscribe (title) =>
+    #     @meta['title'] = title
+    #     @isDirty(true)
+
+    #     obs.onNext
+    #       type: 'change'
+    #       meta: @meta
+    #       content: @content
+        
+    #   @text.changed.subscribe (text) =>
+    #     @content = text
+    #     @isDirty(true)
+
+    #     obs.onNext
+    #       type: 'change'
+    #       meta: @meta
+    #       content: @content
+    _save = undefined
+
+    storageObs = if uuid
+      remote.require('./storage.coffee').open(uuid, _save)
+    else
+      remote.require('./storage.coffee').create(_save)
+
+    storageObs.subscribe (packet) =>
+      switch packet.type
+        when 'meta'
+          @meta = packet
+          delete @meta['type']
+          @title(packet.title)
+        when 'content'
+          @content = packet.content.toString()
+          @text(@content)
 
   setHeight: (height) ->
     @height = height

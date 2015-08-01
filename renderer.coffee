@@ -1,9 +1,7 @@
 marked = require 'marked'
 ipc = require 'ipc'
+remote = require 'remote'
 
-Storage = require './src/storage.coffee'
-RawDriver = require './src/raw_driver.coffee'
-Rxfs = require './src/rxfs.coffee'
 EditorViewModel = require './editor_view_model.coffee'
 
 # matched = location.search.match(/uuid=([^&]*)/)
@@ -35,6 +33,12 @@ class PreviewViewModel
 class AccessViewModel
   constructor: ->
     @html = wx.property '<access></access>'
+    @recent = wx.list()
+    remote.require('./storage.coffee').getRecent().subscribe (meta) =>
+      @recent.push meta
+    @open = wx.command (meta) =>
+      console.dir meta
+      wx.messageBus.sendMessage meta, 'open'
 
   setHeight: (height) ->
     @elem.style.height = "#{height}px"
@@ -133,8 +137,14 @@ class MainViewModel
     @statusBarElem = document.getElementById 'statusbar'
     @id = wx.property 0
 
+    # @focusedPane = 
+
     for n in [0...nPanes]
       @addPane()
+
+    wx.messageBus.listen('open').subscribe (meta) =>
+      console.dir ("-----")
+      @addView(new EditorViewModel(meta.uuid), 0)
 
   addPane: ->
     pane = new PaneViewModel()
@@ -197,6 +207,7 @@ wx.applyBindings(mainViewModel)
 mainViewModel.addPane()
 mainViewModel.addPane()
 mainViewModel.addView(new EditorViewModel(), 0)
+
 mainViewModel.addView(new AccessViewModel(), 0)
 mainViewModel.addView(new PreviewViewModel(), 1)
 

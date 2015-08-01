@@ -60,7 +60,7 @@ application
 * [ ] save を書き直す
 * [ ] editor tab を複数にできるようにする
 * [ ] window resize に対応する
-* [ ] access view を再度実装する
+* [x] access view を再度実装する
 
 * アプリケーション名変更
 * css
