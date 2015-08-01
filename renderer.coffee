@@ -54,7 +54,7 @@ class PaneViewModel
 
 
 class MainViewModel
-  constructor: ->
+  constructor: (nPanes) ->
     @panes = wx.list()
     @status = wx.property 'statusbar'
 
@@ -62,13 +62,20 @@ class MainViewModel
     @statusBarElem = document.getElementById 'statusbar'
     @id = wx.property 0
 
-  addPane: (pane) ->
+    for n in [0...nPanes]
+      @addPane()
+
+  addPane: ->
+    pane = new PaneViewModel()
     @panes.push pane
     n = @panesElem.children.length - 1
     @panesElem.children[n].id = "pane#{n}"
     pane.setId n
     pane.setElement @panesElem.children[n]
     # setHeight
+
+  addView: (viewModel, n) ->
+    @panes.get(n).addView(viewModel)
 
   setHeight: (height) ->
     @panesElem.style.height = "#{height - @statusBarElem.offsetHeight}px"
@@ -91,14 +98,12 @@ wx.app.component 'editor',
 <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
 <textarea class="editor" data-bind="textinput: @text"></textarea>'
 
-editorViewModel = new EditorViewModel()
-paneViewModel = new PaneViewModel()
-mainViewModel = new MainViewModel()
+mainViewModel = new MainViewModel(0)
 
 wx.applyBindings(mainViewModel)
 
-mainViewModel.addPane paneViewModel
-paneViewModel.addView editorViewModel
+mainViewModel.addPane()
+mainViewModel.addView(new EditorViewModel(), 0)
 
 mainViewModel.setHeight(window.innerHeight)
 

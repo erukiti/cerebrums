@@ -48,6 +48,10 @@ application
 	- [ ] アクセスから開く時に新規タブで開く
 * [ ] レンダラープロセスから、ファイルアクセスをメインプロセスに移動する
 
+* [ ] mainViewModel.constructor の引数でpane数を指定してpaneを作成する
+	- [ ] setElemをイベント駆動 (onReady的な)にする
+* [x] mainViewModel#addView を用意する
+
 * アプリケーション名変更
 * css
 	- [ ] preview 用
