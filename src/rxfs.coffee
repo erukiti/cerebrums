@@ -49,7 +49,6 @@ class Rxfs
     filePath = path.resolve(filePath)
     Rx.Observable.create (obs) =>
       _mkdirp path.dirname(filePath), (err) =>
-        console.dir err
         if err
           obs.onError(err)
         else

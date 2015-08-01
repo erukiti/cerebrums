@@ -48,6 +48,8 @@ application
 	- [ ] 新規タブ / command+T
 	- [ ] アクセスから開く時に新規タブで開く
 * [ ] レンダラープロセスから、ファイルアクセスをメインプロセスに移動する
+	- [ ] 
+
 
 * [ ] mainViewModel.constructor の引数でpane数を指定してpaneを作成する
 	- [ ] setElemをイベント駆動 (onReady的な)にする
@@ -57,7 +59,7 @@ application
 * [ ] 初期フォーカス設定
 * [x] editorView -> previewView
 * [x] view から title を tab に反映
-* [ ] save を書き直す
+* [x] save を書き直す
 * [ ] editor tab を複数にできるようにする
 * [ ] window resize に対応する
 * [x] access view を再度実装する

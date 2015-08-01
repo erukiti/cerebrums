@@ -1,5 +1,6 @@
 marked = require 'marked'
 remote = require 'remote'
+ipc = require 'ipc'
 
 class EditorViewModel
   constructor: (uuid) ->
@@ -11,30 +12,40 @@ class EditorViewModel
     @meta = {}
     @content = ''
 
-    # _save = Rx.Observable.create (obs) =>
-    #   @title.changed.subscribe (title) =>
-    #     @meta['title'] = title
-    #     @isDirty(true)
+    storage = require('./storage.coffee')
 
-    #     obs.onNext
-    #       type: 'change'
-    #       meta: @meta
-    #       content: @content
+    _save = Rx.Observable.create (obs) =>
+      @title.changed.subscribe (title) =>
+        @meta['title'] = title
+        @isDirty(true)
+
+        obs.onNext
+          type: 'change'
+          meta: @meta
+          content: @content
         
-    #   @text.changed.subscribe (text) =>
-    #     @content = text
-    #     @isDirty(true)
+      @text.changed.subscribe (text) =>
+        @content = text
+        @isDirty(true)
 
-    #     obs.onNext
-    #       type: 'change'
-    #       meta: @meta
-    #       content: @content
-    _save = undefined
+        obs.onNext
+          type: 'change'
+          meta: @meta
+          content: @content
+
+      ipc.on 'message', (ev, arg) =>
+        switch ev
+          when 'save'
+            obs.onNext
+              type: 'save'
+              meta: @meta
+              content: @content
+            @isDirty(false)
 
     storageObs = if uuid
-      remote.require('./storage.coffee').open(uuid, _save)
+      storage.open(uuid, _save)
     else
-      remote.require('./storage.coffee').create(_save)
+      storage.create(_save)
 
     storageObs.subscribe (packet) =>
       switch packet.type
@@ -45,6 +56,10 @@ class EditorViewModel
         when 'content'
           @content = packet.content.toString()
           @text(@content)
+        when 'saved'
+          wx.messageBus.sendMessage "saved", 'status-bar'
+        else
+          console.dir packet
 
   setHeight: (height) ->
     @height = height

@@ -146,6 +146,9 @@ class MainViewModel
       console.dir ("-----")
       @addView(new EditorViewModel(meta.uuid), 0)
 
+    wx.messageBus.listen('status-bar').subscribe (msg) =>
+      @status(msg)
+
   addPane: ->
     pane = new PaneViewModel()
     @panes.push pane
