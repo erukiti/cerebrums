@@ -53,6 +53,11 @@ application
 * [x] mainViewModel#addView を用意する
 * [x] mainViewModel.addPane を、2ペイン対応にする
 * [ ] 順番が前後しても正常に動くようにする
+* [ ] 初期フォーカス設定
+* [x] editorView -> previewView
+* [x] view から title を tab に反映
+* [ ] save を書き直す
+
 
 * アプリケーション名変更
 * css

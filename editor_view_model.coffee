@@ -1,3 +1,5 @@
+marked = require 'marked'
+
 class EditorViewModel
   constructor: (param) ->
     @title = wx.property ''
@@ -26,8 +28,14 @@ class EditorViewModel
       @elemTitleEditor = @elem.children[1]
       @elemEditor = @elem.children[0]
 
-
   setId: (id) ->
     @id = id
+
+  previewObservable: ->
+    @text.changed.map (text) ->
+      marked(text)
+
+  titleObservable: ->
+    @title.changed.merge(Rx.Observable.just(''))
 
 module.exports = EditorViewModel

@@ -9,6 +9,29 @@ EditorViewModel = require './editor_view_model.coffee'
 # matched = location.search.match(/uuid=([^&]*)/)
 # uuid = matched && decodeURIComponent(matched[1])
 
+class PreviewViewModel
+  constructor: ->
+    @html = wx.property '<div class="pewview" data-bind="html: renderedHtml"></div>'
+    @renderedHtml = wx.property ''
+
+  setHeight: (height) ->
+    @elem.style.height = "#{height}px"
+
+  setWidth: (width) ->
+    @elem.style.width = "#{width}px"
+
+  setElement: (elem) ->
+    @elem = elem
+
+  setId: (id) ->
+    @id = id
+
+  previewObservable: ->
+    Rx.Observable.empty()
+
+  titleObservable: ->
+    Rx.Observable.just('preview')
+
 class PaneViewModel
   constructor: (params) ->
     @tabs = wx.list()
@@ -17,12 +40,26 @@ class PaneViewModel
 
   addView: (view) ->
     n = @tabs.length()
-    @tabs.push {tabTitle: "tab#{n + 1}"}
+    tab = {tabTitle: wx.property ''}
+    @tabs.push tab
     @views.push view
 
     @elemViews.children[n].id = "view#{n}"
     view.setId n
     view.setElement @elemViews.children[n]
+
+    view.titleObservable().map (title) ->
+      if title == ''
+        'no title'
+      else
+        title
+    .map (title) ->
+      if title.length > 10
+        "#{title.substr(0, 10)}..."
+      else
+        title
+    .subscribe (title) ->
+      tab.tabTitle(title)
 
   setWidth: (width) ->
     @width = width
@@ -32,7 +69,9 @@ class PaneViewModel
 
   setX: (x) ->
     @elem.style.x = x
-    console.dir "setX #{@elem}"
+
+  setY: (y) ->
+    @elem.style.y = y
 
   setHeight: (height) ->
     @elem.style.height = "#{height}px"
@@ -51,11 +90,11 @@ class PaneViewModel
       @elemTabs = elem.children[1]
       @elemViews = elem.children[0]
 
-
-
   setId: (id) ->
     @id = id
 
+  getView: ->
+    @views.get(@tabIndex())
 
 class MainViewModel
   constructor: (nPanes) ->
@@ -85,14 +124,16 @@ class MainViewModel
     @panesElem.style.height = "#{height - @statusBarElem.offsetHeight}px"
     @panes.forEach (pane) =>
       pane.setHeight height - @statusBarElem.offsetHeight
+      pane.setY 0
 
   setWidth: (width) ->
-    console.log "setWidth #{width}"
     @panesElem.style.width = "#{width}px"
     for n in [0...@panes.length()]
-      console.dir n
       @panes.get(n).setWidth width / @panes.length()
       @panes.get(n).setX width / @panes.length() * n
+
+  getView: (n) ->
+    @panes.get(n).getView()
 
 wx.app.component 'pane',
   template: '
@@ -116,6 +157,11 @@ wx.applyBindings(mainViewModel)
 mainViewModel.addPane()
 mainViewModel.addPane()
 mainViewModel.addView(new EditorViewModel(), 0)
+mainViewModel.addView(new PreviewViewModel(), 1)
+
+mainViewModel.getView(0).previewObservable().subscribe (html) ->
+  mainViewModel.getView(1).renderedHtml(html)
+
 
 mainViewModel.setHeight(window.innerHeight)
 mainViewModel.setWidth(window.innerWidth)
