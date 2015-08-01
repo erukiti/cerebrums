@@ -26,11 +26,15 @@ class PaneViewModel
 
   setWidth: (width) ->
     @width = width
+    @elem.style.width = "#{width}px"
     @views.forEach (view) ->
       view.setWidth width
 
+  setX: (x) ->
+    @elem.style.x = x
+    console.dir "setX #{@elem}"
+
   setHeight: (height) ->
-    console.log height
     @elem.style.height = "#{height}px"
     @height = height
     height -= @elemTabs.offsetHeight
@@ -82,6 +86,13 @@ class MainViewModel
     @panes.forEach (pane) =>
       pane.setHeight height - @statusBarElem.offsetHeight
 
+  setWidth: (width) ->
+    console.log "setWidth #{width}"
+    @panesElem.style.width = "#{width}px"
+    for n in [0...@panes.length()]
+      console.dir n
+      @panes.get(n).setWidth width / @panes.length()
+      @panes.get(n).setX width / @panes.length() * n
 
 wx.app.component 'pane',
   template: '
@@ -103,9 +114,11 @@ mainViewModel = new MainViewModel(0)
 wx.applyBindings(mainViewModel)
 
 mainViewModel.addPane()
+mainViewModel.addPane()
 mainViewModel.addView(new EditorViewModel(), 0)
 
 mainViewModel.setHeight(window.innerHeight)
+mainViewModel.setWidth(window.innerWidth)
 
 
 

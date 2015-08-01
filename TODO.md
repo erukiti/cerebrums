@@ -51,6 +51,8 @@ application
 * [ ] mainViewModel.constructor の引数でpane数を指定してpaneを作成する
 	- [ ] setElemをイベント駆動 (onReady的な)にする
 * [x] mainViewModel#addView を用意する
+* [x] mainViewModel.addPane を、2ペイン対応にする
+* [ ] 順番が前後しても正常に動くようにする
 
 * アプリケーション名変更
 * css

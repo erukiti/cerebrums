@@ -11,12 +11,14 @@ class EditorViewModel
 
     @elemEditor.style.height = "#{height - @elemTitleEditor.offsetHeight}px"
 
-    console.dir height
-    console.dir @elem
+  setWidth: (width) ->
+    @width = width
+    @elem.style.width = "#{width}px"
+    @elemEditor.style.width = "#{width}px"
+    @elemTitleEditor.style.width = "#{width}px"
 
   setElement: (elem) ->
     @elem = elem.children[0]
-    console.dir @elem
     if @elem.children[0].className == 'titleEditor'
       @elemTitleEditor = @elem.children[0]
       @elemEditor = @elem.children[1]
