@@ -82,10 +82,10 @@ class PaneViewModel
     #     else
     #       Rx.Observable.empty()
 
-    @previewObservable = Rx.Observable.create (obs) =>
-      @tabView.changed.subscribe (view) =>
-        view.previewObservable().subscribe (html) =>
-          obs.onNext(html)
+    # @previewObservable = Rx.Observable.create (obs) =>
+    #   @tabView.changed.subscribe (view) =>
+    #     view.previewObservable().subscribe (html) =>
+    #       obs.onNext(html)
 
   addView: (view) ->
     n = @tabs.length()

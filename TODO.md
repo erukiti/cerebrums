@@ -64,10 +64,15 @@ application
 * [x] window resize に対応する
 * [x] access view を再度実装する
 * [ ] cmd+O
+	* [ ] なければ AccessViewModel を作る
+	* [ ] あれば AccessViewModel に切り替える
+* [ ] 複数の preview / access を作れるようにする
 * [x] 同じファイルを複数回開けないようにする
 * [ ] 全ペインに UUID を発行する
 * [ ] editor -> preview のつなぎ込みをもうちょっとマシにする
-
+	* [ ] class の外に散らばってるロジックを class におさめる
+	* [ ] panes.get() の決め打ちをなくす
+* [ ] access view にカーソルを用意する / シングルクリック・ダブルクリック
 
 * アプリケーション名変更
 * css
