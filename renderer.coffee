@@ -61,8 +61,32 @@ class PaneViewModel
     @views = wx.list()
     @tabView = wx.property null
     @tabChange = wx.command (tab) =>
-      console.dir tab
       @tabView(tab.view)
+
+    # @previewObservable = Rx.Observable.create (obs) =>
+    #   @views.listChanged.subscribe (flags) =>
+    #     console.log flags
+    #     for view in @views
+    #       obs.onNext(view.previewObservable())
+    # .flatMap (obs) =>
+    #   obs
+
+    # @previewObservable = @tabView.changed.flatMap (view) =>
+    #   console.dir "---- #{view}"
+    #   view.previewObservable()
+
+    # @previewObservable = @views.listChanged.flatMap (flags) =>
+    #   @tabView.changed.flatMap (tabView) =>
+    #     if tabView == view
+    #       view.previewObservable()
+    #     else
+    #       Rx.Observable.empty()
+
+    @previewObservable = Rx.Observable.create (obs) =>
+      @tabView.changed.subscribe (view) =>
+        view.previewObservable().subscribe (html) =>
+          obs.onNext(html)
+
   addView: (view) ->
     n = @tabs.length()
     tab = {tabTitle: wx.property(''), view: view}
@@ -82,7 +106,7 @@ class PaneViewModel
         title
     .map (title) ->
       if title.length > 10
-        "#{title.substr(0, 10)}..."
+        "#{title.substr(0, 8)}..."
       else
         title
     .subscribe (title) ->
@@ -211,8 +235,10 @@ mainViewModel.addView(new EditorViewModel(), 0)
 mainViewModel.addView(new AccessViewModel(), 0)
 mainViewModel.addView(new PreviewViewModel(), 1)
 
-mainViewModel.getView(0).previewObservable().subscribe (html) ->
-  mainViewModel.getView(1).renderedHtml(html)
+# mainViewModel.panes.get(0).previewObservable.subscribe (html) ->
+mainViewModel.panes.get(0).tabView.changed.merge(Rx.Observable.just(mainViewModel.panes.get(0).tabView())).subscribe (view) =>
+  view.previewObservable().subscribe (html) =>
+    mainViewModel.getView(1).renderedHtml(html)
 
 # throttle 的な手加減した方がいいかも
 Rx.Observable.fromEvent(window, 'resize').merge(Rx.Observable.just(null)).subscribe (ev) =>

@@ -60,11 +60,14 @@ application
 * [x] editorView -> previewView
 * [x] view から title を tab に反映
 * [x] save を書き直す
-* [ ] editor tab を複数にできるようにする
+* [x] editor tab を複数にできるようにする
 * [x] window resize に対応する
 * [x] access view を再度実装する
 * [ ] cmd+O
 * [x] 同じファイルを複数回開けないようにする
+* [ ] 全ペインに UUID を発行する
+* [ ] editor -> preview のつなぎ込みをもうちょっとマシにする
+
 
 * アプリケーション名変更
 * css

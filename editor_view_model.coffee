@@ -86,8 +86,46 @@ class EditorViewModel
     @id = id
 
   previewObservable: ->
-    @text.changed.map (text) ->
+    @text.changed.merge(Rx.Observable.just(@text())).map (text) ->
       marked(text)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   titleObservable: ->
     @title.changed.merge(Rx.Observable.just(''))
