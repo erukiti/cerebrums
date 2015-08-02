@@ -34,7 +34,6 @@ class AccessViewModel
     remote.require('./storage.coffee').getRecent().subscribe (meta) =>
       @recent.push meta
     @open = wx.command (meta) =>
-      console.dir meta
       wx.messageBus.sendMessage meta, 'open'
 
   setHeight: (height) ->
@@ -64,7 +63,6 @@ class PaneViewModel
     @tabChange = wx.command (tab) =>
       console.dir tab
       @tabView(tab.view)
-
   addView: (view) ->
     n = @tabs.length()
     tab = {tabTitle: wx.property(''), view: view}
@@ -134,13 +132,17 @@ class MainViewModel
     @statusBarElem = document.getElementById 'statusbar'
     @id = wx.property 0
 
+    @opendList = wx.list()
+
     # @focusedPane = 
 
     for n in [0...nPanes]
       @addPane()
 
     wx.messageBus.listen('open').subscribe (meta) =>
-      @addView(new EditorViewModel(meta.uuid), 0)
+      unless @opendList.contains(meta.uuid)
+        @addView(new EditorViewModel(meta.uuid), 0)
+        @opendList.push meta.uuid
 
     wx.messageBus.listen('status-bar').subscribe (msg) =>
       @status(msg)

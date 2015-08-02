@@ -63,6 +63,8 @@ application
 * [ ] editor tab を複数にできるようにする
 * [x] window resize に対応する
 * [x] access view を再度実装する
+* [ ] cmd+O
+* [x] 同じファイルを複数回開けないようにする
 
 * アプリケーション名変更
 * css
