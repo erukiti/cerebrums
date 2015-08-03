@@ -35,7 +35,7 @@ class EditorViewModel
           content: @content
 
       ipc.on 'message', (ev, arg) =>
-        switch ev
+        switch ev.type
           when 'save'
             obs.onNext
               type: 'save'

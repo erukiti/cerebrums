@@ -194,11 +194,20 @@ class MainViewModel
       @panes.get(0).tabView(view) if view
 
     ipc.on 'message', (ev, arg) =>
-      switch ev
+      switch ev.type
         when 'close'
           @panes.get(0).closeView()
         when 'tab'
-          @addView new EditorViewModel(), 0
+          @addView(new EditorViewModel(), 0)
+        when 'access'
+          for view in @panes.get(0).views.toArray()
+            if view.uuid == 'access-view'
+              @panes.get(0).tabView(view)
+              return
+
+          view = new AccessViewModel()
+          @addView(view, 0)
+          @panes.get(0).tabView(view)
 
     wx.messageBus.listen('status-bar').subscribe (msg) =>
       @status(msg)

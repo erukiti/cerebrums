@@ -52,9 +52,6 @@ application
 	- [ ] タブをDnDで移動する
 	- [ ] 新規タブボタンを tab bar に表示する
 * [ ] 初期フォーカス設定
-* [ ] cmd+O
-	* [ ] なければ AccessViewModel を作る
-	* [ ] あれば AccessViewModel に切り替える
 * [ ] access view にカーソルを用意する / シングルクリック・ダブルクリック
 * [ ] access view で、文字部分しかクリックできない問題の解決
 * access view を強化する
@@ -62,7 +59,8 @@ application
 	- [ ] 表示する情報を増やす
 	- [ ] スクロールするだけの量ができた時に対応がうまくいってるか？
 	- [ ] 検索
-* close tab で、dirty 状態の時ダイアログを出す
+* [ ] close tab で、dirty 状態の時ダイアログを出す
+* [ ] 閉じたタブを開く を実装する
 
 * アプリケーション名変更
 * css
