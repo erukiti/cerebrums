@@ -10,15 +10,8 @@ windows = []
 app.on 'window-all-closed', ->
   app.quit()
 
-ipc.on 'open', (ev, uuid) ->
-  win = new BrowserWindow {width: 800, height: 600}
-  win.loadUrl "file://#{__dirname}/index.html?uuid=#{encodeURIComponent(uuid)}"
-
-  win.on 'closed', ->
-    console.log 'closed'
-
-  windows.push win
-  
+browserCommand = (message) =>
+  BrowserWindow.getFocusedWindow().webContents.send 'message', message
 
 app.on 'ready', ->
   win = new BrowserWindow {width: 800, height: 600}
@@ -51,22 +44,28 @@ app.on 'ready', ->
       label: 'File'
       submenu: [
         {
+          label: 'New'
+          accelerator: 'Command+T'
+          click: ->
+            browserCommand {type: 'tab'}
+        },
+        {
           label: 'Open'
           accelerator: 'Command+O'
           click: ->
-            BrowserWindow.getFocusedWindow().webContents.send 'message', 'open'
+            browserCommand {type: 'access'}
         },
         {
           label: 'Save'
           accelerator: 'Command+S'
           click: ->
-            BrowserWindow.getFocusedWindow().webContents.send 'message', 'save'
+            browserCommand {type: 'save'}
         },
         {
           label: 'Close'
           accelerator: 'Command+W'
           click: ->
-            BrowserWindow.getFocusedWindow().webContents.send 'message', 'close'
+            browserCommand {type: 'close'}
         }
       ]
     }

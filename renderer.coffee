@@ -90,6 +90,8 @@ class PaneViewModel
     #       obs.onNext(html)
 
   closeView: () ->
+    # view に close してもいいかお伺いを立てる
+
     for tab in @tabs.toArray()
       if tab.view == @tabView()
         @tabs.remove(tab)
@@ -195,6 +197,8 @@ class MainViewModel
       switch ev
         when 'close'
           @panes.get(0).closeView()
+        when 'tab'
+          @addView new EditorViewModel(), 0
 
     wx.messageBus.listen('status-bar').subscribe (msg) =>
       @status(msg)
@@ -210,6 +214,7 @@ class MainViewModel
 
   addView: (viewModel, n) ->
     @panes.get(n).addView(viewModel)
+    # Elem, height, width などを設定する
 
   setHeight: (height) ->
     @panesElem.style.height = "#{height - @statusBarElem.offsetHeight}px"
