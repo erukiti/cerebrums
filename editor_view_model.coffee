@@ -4,6 +4,7 @@ ipc = require 'ipc'
 
 class EditorViewModel
   constructor: (uuid) ->
+    @uuid = uuid
     @title = wx.property ''
     @text = wx.property ''
     @isDirty = wx.property false

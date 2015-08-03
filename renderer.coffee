@@ -6,6 +6,7 @@ EditorViewModel = require './editor_view_model.coffee'
 
 class PreviewViewModel
   constructor: ->
+    @uuid = "preview-view"
     @html = wx.property '<div class="preview" data-bind="html: renderedHtml"></div>'
     @renderedHtml = wx.property ''
 
@@ -29,6 +30,7 @@ class PreviewViewModel
 
 class AccessViewModel
   constructor: ->
+    @uuid = "access-view"
     @html = wx.property '<access></access>'
     @recent = wx.list()
     remote.require('./storage.coffee').getRecent().subscribe (meta) =>
@@ -86,6 +88,13 @@ class PaneViewModel
     #   @tabView.changed.subscribe (view) =>
     #     view.previewObservable().subscribe (html) =>
     #       obs.onNext(html)
+
+  searchView: (uuid) ->
+    console.dir uuid
+    for view in @views.toArray()
+      return view if uuid == view.uuid
+
+    null
 
   addView: (view) ->
     n = @tabs.length()
@@ -164,9 +173,15 @@ class MainViewModel
       @addPane()
 
     wx.messageBus.listen('open').subscribe (meta) =>
-      unless @opendList.contains(meta.uuid)
-        @addView(new EditorViewModel(meta.uuid), 0)
+      if @opendList.contains(meta.uuid)
+        view = @panes.get(0).searchView(meta.uuid)
+        console.dir view
+      else
+        view = new EditorViewModel(meta.uuid)
+        @addView(view, 0)
         @opendList.push meta.uuid
+
+      @panes.get(0).tabView(view) if view
 
     wx.messageBus.listen('status-bar').subscribe (msg) =>
       @status(msg)

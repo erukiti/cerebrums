@@ -68,6 +68,7 @@ application
 	* [ ] あれば AccessViewModel に切り替える
 * [ ] 複数の preview / access を作れるようにする
 * [x] 同じファイルを複数回開けないようにする
+* [x] access view からクリックで新しいタブに移動する
 * [ ] 全ペインに UUID を発行する
 * [ ] editor -> preview のつなぎ込みをもうちょっとマシにする
 	* [ ] class の外に散らばってるロジックを class におさめる
