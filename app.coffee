@@ -61,6 +61,12 @@ app.on 'ready', ->
           accelerator: 'Command+S'
           click: ->
             BrowserWindow.getFocusedWindow().webContents.send 'message', 'save'
+        },
+        {
+          label: 'Close'
+          accelerator: 'Command+W'
+          click: ->
+            BrowserWindow.getFocusedWindow().webContents.send 'message', 'close'
         }
       ]
     }

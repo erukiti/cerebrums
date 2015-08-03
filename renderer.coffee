@@ -89,8 +89,17 @@ class PaneViewModel
     #     view.previewObservable().subscribe (html) =>
     #       obs.onNext(html)
 
+  closeView: () ->
+    for tab in @tabs.toArray()
+      if tab.view == @tabView()
+        @tabs.remove(tab)
+        break
+
+    @views.remove(@tabView())
+
+    @tabView(@tabs.get(@tabs.length - 1))
+
   searchView: (uuid) ->
-    console.dir uuid
     for view in @views.toArray()
       return view if uuid == view.uuid
 
@@ -175,13 +184,17 @@ class MainViewModel
     wx.messageBus.listen('open').subscribe (meta) =>
       if @opendList.contains(meta.uuid)
         view = @panes.get(0).searchView(meta.uuid)
-        console.dir view
       else
         view = new EditorViewModel(meta.uuid)
         @addView(view, 0)
         @opendList.push meta.uuid
 
       @panes.get(0).tabView(view) if view
+
+    ipc.on 'message', (ev, arg) =>
+      switch ev
+        when 'close'
+          @panes.get(0).closeView()
 
     wx.messageBus.listen('status-bar').subscribe (msg) =>
       @status(msg)
@@ -252,8 +265,11 @@ mainViewModel.addView(new PreviewViewModel(), 1)
 
 # mainViewModel.panes.get(0).previewObservable.subscribe (html) ->
 mainViewModel.panes.get(0).tabView.changed.merge(Rx.Observable.just(mainViewModel.panes.get(0).tabView())).subscribe (view) =>
-  view.previewObservable().subscribe (html) =>
-    mainViewModel.getView(1).renderedHtml(html)
+  if view
+    view.previewObservable().subscribe (html) =>
+      mainViewModel.getView(1).renderedHtml(html)
+  # if view はちょっと苦肉の策
+
 
 # throttle 的な手加減した方がいいかも
 Rx.Observable.fromEvent(window, 'resize').merge(Rx.Observable.just(null)).subscribe (ev) =>

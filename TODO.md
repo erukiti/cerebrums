@@ -33,17 +33,14 @@ application
 		* [ ] 横
 * [ ] ステータスバー
 	* [ ] エラーをステータスバーに表示する
-	* [x] セーブした報告をステータスバーに表示する
 	* [ ] オープンしてるファイルの情報を表示する
 * [x] tab キーの挙動を変える
 * [ ] エディタの末尾でスペースやtabを入力しても駄目な現象の解明
 * [ ] カーソル上下で、タイトル・本文を移動できるようにする
 * [ ] preview view の word-wrap を有効にする
 * タブ
-	- [x] タブ切り替え
-	- [x] タブの動的な追加
 	- [ ] タブの見た目を整える
-	- [ ] タブを閉じるボタン / command+W
+	- [ ] タブを閉じるボタン
 	- [ ] タブをDnDで移動する
 	- [ ] 新規タブ / command+T
 	- [x] アクセスから開く時に新規タブで開く
@@ -53,22 +50,12 @@ application
 
 * [ ] mainViewModel.constructor の引数でpane数を指定してpaneを作成する
 	- [ ] setElemをイベント駆動 (onReady的な)にする
-* [x] mainViewModel#addView を用意する
-* [x] mainViewModel.addPane を、2ペイン対応にする
 * [ ] 順番が前後しても正常に動くようにする
 * [ ] 初期フォーカス設定
-* [x] editorView -> previewView
-* [x] view から title を tab に反映
-* [x] save を書き直す
-* [x] editor tab を複数にできるようにする
-* [x] window resize に対応する
-* [x] access view を再度実装する
 * [ ] cmd+O
 	* [ ] なければ AccessViewModel を作る
 	* [ ] あれば AccessViewModel に切り替える
 * [ ] 複数の preview / access を作れるようにする
-* [x] 同じファイルを複数回開けないようにする
-* [x] access view からクリックで新しいタブに移動する
 * [ ] 全ペインに UUID を発行する
 * [ ] editor -> preview のつなぎ込みをもうちょっとマシにする
 	* [ ] class の外に散らばってるロジックを class におさめる
