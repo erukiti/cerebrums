@@ -40,8 +40,8 @@ class BWT
     i = 0
     while i < s.length
       # console.log "loop: #{ind} #{lf(wm, ind, s[ind])}"
-      ind = lf(wm, ind, s[ind], s.length)
-      result = "#{s[ind]}#{result}"
+      ind = lf(wm, ind, wm.get(ind), s.length)
+      result = "#{String.fromCharCode(wm.get(ind))}#{result}"
       i++
 
     result
