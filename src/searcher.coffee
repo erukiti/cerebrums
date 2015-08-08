@@ -1,8 +1,9 @@
-WaveletMatrix = require './wavelet_matrix.coffee'
 
 class Searcher
   constructor: ->
 
+  add: (meta, content) ->
+    
 
 
 

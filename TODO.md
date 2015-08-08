@@ -37,6 +37,7 @@ application
 	- pane0/pane1 をそれぞれ決め打ちしてる状況をやめる
 
 * [ ] split bar
+    - [ ] pane と pane の間に bar を作成する
     - [ ] barを動かせるようにする
 * [ ] ステータスバー
 	* [ ] エラーをステータスバーに表示する
