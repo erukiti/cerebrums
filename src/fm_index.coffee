@@ -71,7 +71,7 @@ class FmIndex
           @wayPoints[wayPoint.ind >> 4] = {meta: metaInd, ind: i - wayPoint.i}
 
         @wayPointsPerFile[ind] = metaInd
-        @metaInd--
+        metaInd--
         wayPoints = []
 
       ind = _lf(ind, c)
@@ -82,28 +82,14 @@ class FmIndex
 
     @wayPointsPerFile[ind] = metaInd
 
-  decode: ->
-    ind = @last
-    result = []
-    i = 0
-    while i < @bwtLength
-      result.unshift @bwt.get(ind)
-      ind = _lf(ind, @bwt.get(ind))
-      i++
-    result
-
-    # s = ''
-    # for ind in result
-    #   s += @usedChars[]
-
-  search: (query) ->
+  search: (query, max = 0) ->
     _lf = (ind, c) =>
       @bwt.rank(ind, c) + @bwt.rankLessThan(@bwtLength, c)
 
     q = []
     for ch in query
       unless @usedChars[ch.charCodeAt(0)]
-        return []
+        return {hits: 0, results:[]}
       else
         q.push @usedChars[ch.charCodeAt(0)]
 
@@ -115,8 +101,11 @@ class FmIndex
       c = q[i]
       start = _lf(start, c)
       end = _lf(end, c)
-      return [] if start >= end
+      return {hits: 0, results:[]} if start >= end
       i--
+
+    if max > 0 && end - start > max
+      return {hits: end - start, results: []}
 
     results = for ind in [start...end]
       pos = 0
@@ -135,6 +124,7 @@ class FmIndex
         ind = _lf(ind, c)
         pos++
       {uuid: @metaArray[metaInd].uuid, sha256: @metaArray[metaInd].sha256, pos: pos}
-    results
+
+    {hits: end - start, results: results}
 
 module.exports = FmIndex
