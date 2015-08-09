@@ -63,16 +63,9 @@ application
 * [ ] close tab で、dirty 状態の時ダイアログを出す
 * [ ] 閉じたタブを開く を実装する
 
-* 足回り再調整
-	- FM-indexはメモリオンリー
-	- [x] FM-index実装
-	- [x] FM-index#search で max 指定時、検索結果が多すぎる時に件数のみ返す
-	- [ ] search実装
-		* [ ] Rxな検索インターフェース
-		* [ ] 全UUIDファイルスキャンして初期生成する
-		* [ ] 文書追加
-			- [ ] decodeAll (なくてもいいかも？)
-		* [ ] title / contents それぞれのFM-index
+* [ ] 足回りに遅延処理を導入する
+	- [ ] 検索インデックス作成
+* [ ] FmIndex#decodeAll
 
 * アプリケーション名変更
 * css

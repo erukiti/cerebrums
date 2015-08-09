@@ -1,5 +1,4 @@
 WaveletMatrix = require './wavelet_matrix.coffee'
-BWT = require './bwt.coffee'
 
 class FmIndex
   constructor: (documents) ->
@@ -42,7 +41,7 @@ class FmIndex
       for ch in doc.text
         s.push @usedChars[ch.charCodeAt(0)]
       s.push 1
-      @metaArray.push {uuid: doc.uuid, sha256: doc.sha256}
+      @metaArray.push {uuid: doc.uuid}
     s.pop() # 最後の1を捨てる
     s.push 0
 
@@ -123,7 +122,7 @@ class FmIndex
 
         ind = _lf(ind, c)
         pos++
-      {uuid: @metaArray[metaInd].uuid, sha256: @metaArray[metaInd].sha256, pos: pos}
+      {uuid: @metaArray[metaInd].uuid, pos: pos}
 
     {hits: end - start, results: results}
 

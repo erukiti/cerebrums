@@ -27,6 +27,7 @@
     "sha256": "^0.2.0",
     "sinon": "^1.15.3",
     "source-map-support": "^0.3.2",
+    "underscore": "^1.8.3",
     "uuid-v4": "^0.1.0",
     "webrx": "^0.9.87"
   }
