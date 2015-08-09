@@ -6,10 +6,12 @@ class Searcher
   constructor: (docs) ->
     @docsText = {}
     @docsTitle = {}
+    @docsUpdatedAt = {}
 
     for doc in docs
       @docsText[doc.meta.uuid] = {uuid: doc.meta.uuid, text: doc.text}
       @docsTitle[doc.meta.uuid] = {uuid: doc.meta.uuid, text: doc.meta.title}
+      @docsUpdatedAt[doc.meta.uuid] = {uuid: doc.meta.uuid, updatedAt: doc.meta.updatedAt}
 
     console.time('searcher index create')
     @fmIndexText = new FmIndex(_.map(@docsText, (docs) -> docs))
@@ -33,5 +35,8 @@ class Searcher
       results[result.uuid] = result.uuid
 
     _.map(results, (uuid) -> uuid).sort()
+
+  recent: ->
+    _.map(_.sortBy(_.map(@docsUpdatedAt, (doc) -> doc), (doc) -> -doc.updatedAt), (doc) -> doc.uuid)
 
 module.exports = Searcher
