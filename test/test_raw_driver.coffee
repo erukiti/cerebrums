@@ -57,7 +57,7 @@ describe 'RawDriver', ->
 
     assert stub.calledOnce
 
-  it '#getRecent', ->
+  it '#getAllPointer', ->
     dummyObservable = {}
     dummyFunc = -> null
     rxfs = {readDir: dummyFunc}
@@ -65,7 +65,7 @@ describe 'RawDriver', ->
     stubReaddir.withArgs('/path/pointer').returns(Rx.Observable.just(['/path/pointer/1111']))
 
     rawDriver = new RawDriver(rxfs, {basePath: '/path'})
-    rawDriver.getRecent().subscribe (uuids) ->
+    rawDriver.getAllPointer().subscribe (uuids) ->
       assert.deepEqual uuids, ['1111']
 
     assert stubReaddir.calledOnce

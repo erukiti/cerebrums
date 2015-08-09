@@ -11,7 +11,7 @@ class Searcher
     for doc in docs
       @docsText[doc.meta.uuid] = {uuid: doc.meta.uuid, text: doc.text}
       @docsTitle[doc.meta.uuid] = {uuid: doc.meta.uuid, text: doc.meta.title}
-      @docsUpdatedAt[doc.meta.uuid] = {uuid: doc.meta.uuid, updatedAt: doc.meta.updatedAt}
+      @docsUpdatedAt[doc.meta.uuid] = {meta: doc.meta}
 
     console.time('searcher index create')
     @fmIndexText = new FmIndex(_.map(@docsText, (docs) -> docs))
@@ -36,7 +36,7 @@ class Searcher
 
     _.map(results, (uuid) -> uuid).sort()
 
-  recent: ->
-    _.map(_.sortBy(_.map(@docsUpdatedAt, (doc) -> doc), (doc) -> -doc.updatedAt), (doc) -> doc.uuid)
+  getRecent: ->
+    _.map(_.sortBy(_.map(@docsUpdatedAt, (doc) -> doc), (doc) -> -doc.meta.updatedAt), (doc) -> doc.meta)
 
 module.exports = Searcher

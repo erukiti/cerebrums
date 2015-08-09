@@ -17,12 +17,16 @@ describe 'Searcher', ->
     assert.deepEqual searcher.search('ほ'), ['hoge3']
 
   it '#recent', ->
+    meta1 = {uuid: 'hoge1', title: 'hogefuga', updatedAt: Date.parse('2015-07-14T00:00:00.000Z')}
+    meta2 = {uuid: 'hoge2', title: 'abracadabra', updatedAt: Date.parse('2015-07-15T00:00:00.000Z')}
+    meta3 = {uuid: 'hoge3', title: 'ほげふが', updatedAt: Date.parse('2015-07-12T00:00:00.000Z')}
+
     docs = [
-      {meta: {uuid: 'hoge1', title: 'hogefuga', updatedAt: Date.parse('2015-07-14T00:00:00.000Z')}, text: 'hoge fuga piyo'}
-      {meta: {uuid: 'hoge2', title: 'abracadabra', updatedAt: Date.parse('2015-07-15T00:00:00.000Z')}, text: 'abracadabra'}
-      {meta: {uuid: 'hoge3', title: 'ほげふが', updatedAt: Date.parse('2015-07-12T00:00:00.000Z')}, text: 'ほげ ふが ぴよ'}
+      {meta: meta1, text: 'hoge fuga piyo'}
+      {meta: meta2, text: 'abracadabra'}
+      {meta: meta3, text: 'ほげ ふが ぴよ'}
     ]
     searcher = new Searcher(docs)
 
-    assert.deepEqual searcher.recent(), ['hoge2', 'hoge1', 'hoge3']
+    assert.deepEqual searcher.getRecent(), [meta2, meta1, meta3]
 

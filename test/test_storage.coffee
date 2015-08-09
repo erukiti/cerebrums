@@ -19,6 +19,9 @@ describe 'Storage', ->
           @writePointerCounter = 0
           @writeBlobCounter = 0
 
+        getAllPointer: ->
+          Rx.Observable.empty()
+
         writeBlob: (hash, content) ->
           switch @writeBlobCounter
             when 0 
@@ -89,6 +92,9 @@ describe 'Storage', ->
           @readBlobCounter = 0
           @writePointerCounter = 0
           @writeBlobCounter = 0
+
+        getAllPointer: ->
+          Rx.Observable.empty()
 
         readPointer: (uuid) ->
           assert uuid == '1111'
@@ -162,25 +168,52 @@ describe 'Storage', ->
       clock.restore()
 
   describe '#getRecent', ->
-    meta1 = {title: 'hoge'}
-    meta2 = {title: 'fuga'}
+    meta1 = {uuid: '1111', title: 'hoge', sha256: '5555'}
+    meta2 = {uuid: '2222', title: 'fuga', sha256: '6666'}
     dummyFunc = -> null
-    dummyRawDriver = {getRecent: dummyFunc, readPointer: dummyFunc, readBlob: dummyFunc}
-    stubGetRecent = sinon.stub(dummyRawDriver, 'getRecent')
-    stubGetRecent.withArgs().returns(Rx.Observable.just(['1111', '2222']))
+    dummyRawDriver = {getAllPointer: dummyFunc, readPointer: dummyFunc, readBlob: dummyFunc}
+    stubGetAllPointer = sinon.stub(dummyRawDriver, 'getAllPointer')
+    stubGetAllPointer.withArgs().returns(Rx.Observable.from(['1111', '2222']))
     stubReadPointer = sinon.stub(dummyRawDriver, 'readPointer')
     stubReadPointer.withArgs('1111').returns(Rx.Observable.just('3333'))
     stubReadPointer.withArgs('2222').returns(Rx.Observable.just('4444'))
     stubReadBlob = sinon.stub(dummyRawDriver, 'readBlob')
     stubReadBlob.withArgs('3333').returns(Rx.Observable.just(msgpack.encode(meta1)))
     stubReadBlob.withArgs('4444').returns(Rx.Observable.just(msgpack.encode(meta2)))
+    stubReadBlob.withArgs('5555').returns(Rx.Observable.just('hoge hoge'))
+    stubReadBlob.withArgs('6666').returns(Rx.Observable.just('fuga fuga'))
 
     storage = new Storage(dummyRawDriver)
-    storage.getRecent().subscribe (x) ->
-      assert x.title == 'hoge' || x.title == 'fuga'
+    storage.getRecent().toArray().subscribe (x) ->
+      assert.deepEqual x, [meta1, meta2]
 
-    assert stubGetRecent.calledOnce
+    assert stubGetAllPointer.calledOnce
     assert stubReadPointer.calledTwice
-    assert stubReadBlob.calledTwice
+    assert stubReadBlob.called
+
+  describe '#search', ->
+    meta1 = {uuid: '1111', title: 'hoge', sha256: '5555'}
+    meta2 = {uuid: '2222', title: 'fuga', sha256: '6666'}
+    dummyFunc = -> null
+    dummyRawDriver = {getAllPointer: dummyFunc, readPointer: dummyFunc, readBlob: dummyFunc}
+    stubGetAllPointer = sinon.stub(dummyRawDriver, 'getAllPointer')
+    stubGetAllPointer.withArgs().returns(Rx.Observable.from(['1111', '2222']))
+    stubReadPointer = sinon.stub(dummyRawDriver, 'readPointer')
+    stubReadPointer.withArgs('1111').returns(Rx.Observable.just('3333'))
+    stubReadPointer.withArgs('2222').returns(Rx.Observable.just('4444'))
+    stubReadBlob = sinon.stub(dummyRawDriver, 'readBlob')
+    stubReadBlob.withArgs('3333').returns(Rx.Observable.just(msgpack.encode(meta1)))
+    stubReadBlob.withArgs('4444').returns(Rx.Observable.just(msgpack.encode(meta2)))
+    stubReadBlob.withArgs('5555').returns(Rx.Observable.just('hoge hoge'))
+    stubReadBlob.withArgs('6666').returns(Rx.Observable.just('fuga fuga'))
+
+    storage = new Storage(dummyRawDriver)
+    storage.search('hoge').subscribe (x) ->
+      assert.deepEqual x, ['1111']
+
+    assert stubGetAllPointer.calledOnce
+    assert stubReadPointer.calledTwice
+    assert stubReadBlob.called
+
 
 

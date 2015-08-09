@@ -3,9 +3,24 @@ sha256 = require 'sha256'
 uuidv4 = require 'uuid-v4'
 msgpack = require 'msgpack-js'
 
+Searcher = require './searcher.coffee'
+
 class Storage
   constructor: (rawDriver) ->
     @rawDriver = rawDriver
+    @searcher = new Searcher([])
+
+    docs = []
+    @rawDriver.getAllPointer().flatMap (uuid) =>
+      @rawDriver.readPointer(uuid).flatMap (metaHash) =>
+        @rawDriver.readBlob(metaHash).flatMap (metaMsgpack) =>
+          meta = msgpack.decode(metaMsgpack)
+          meta.uuid = uuid
+          @rawDriver.readBlob(meta.sha256).map (content) =>
+            {meta: meta, text: content}
+    .toArray()
+    .subscribe (docs) =>
+      @searcher = new Searcher(docs)
 
   _write = (rawDriver, uuid, writeObservable, subscriber, prevHash) ->
     return unless writeObservable
@@ -59,15 +74,13 @@ class Storage
 
   getRecent: ->
     Rx.Observable.create (subscriber) =>
-      @rawDriver.getRecent().subscribe (uuids) =>
-        cnt = uuids.length
-        for uuid in uuids
-          @rawDriver.readPointer(uuid).subscribe (metaHash) =>
-            @rawDriver.readBlob(metaHash).subscribe (metaMsgpack) =>
-              meta = msgpack.decode(metaMsgpack)
-              subscriber.onNext(meta)
-              cnt--
-              subscriber.onCompleted() if cnt == 0
+      for meta in @searcher.getRecent()
+        subscriber.onNext meta
+      subscriber.onCompleted()
 
+  search: (query) ->
+    Rx.Observable.create (subscriber) =>
+      subscriber.onNext(@searcher.search(query))
+      subscriber.onCompleted
 
 module.exports = Storage

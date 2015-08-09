@@ -25,7 +25,7 @@ class RawDriver
     # console.log "readPointer: #{path}"
     @rxfs.readFile(path)
 
-  getRecent: =>
+  getAllPointer: =>
     Rx.Observable.create (obs) =>
       @rxfs.readDir("#{@conf.basePath}/pointer").subscribe((dirs) =>
         dirs = for dir in dirs
