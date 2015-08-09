@@ -22,7 +22,7 @@ class Storage
     .subscribe (docs) =>
       @searcher = new Searcher(docs)
 
-  _write = (rawDriver, uuid, writeObservable, subscriber, prevHash) ->
+  _write: (rawDriver, uuid, writeObservable, subscriber, prevHash) =>
     return unless writeObservable
     writeObservable.filter((packet) => packet.type == 'save').subscribe((packet) =>
       content = packet.content
@@ -36,6 +36,9 @@ class Storage
         meta.uuid = uuid
         metaMsgpack = msgpack.encode(meta)
         metaHash = sha256(metaMsgpack)
+
+        @searcher.add(meta, content)
+
         rawDriver.writeBlob(metaHash, metaMsgpack).subscribe((x) =>
           rawDriver.writePointer(uuid, metaHash).subscribe((x) =>
             prevHash = contentHash
@@ -51,7 +54,7 @@ class Storage
 
   create: (writeObservable) ->
     Rx.Observable.create (subscriber) =>
-      _write(@rawDriver, uuidv4(), writeObservable, subscriber)
+      @_write(@rawDriver, uuidv4(), writeObservable, subscriber)
 
   open: (uuid, writeObservable) ->
     Rx.Observable.create (subscriber) =>
@@ -67,7 +70,7 @@ class Storage
             subscriber.onNext({type: 'content', content: content})
           , (err) => subscriber.onError(err)
 
-          _write(@rawDriver, uuid, writeObservable, subscriber, contentHash)
+          @_write(@rawDriver, uuid, writeObservable, subscriber, contentHash)
 
         , (err) => subscriber.onError(err)
       , (err) => subscriber.onError(err)
