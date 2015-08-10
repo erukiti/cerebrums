@@ -1,5 +1,6 @@
 marked = require 'marked'
 ipc = require 'ipc'
+marked = require 'marked'
 
 EditorViewModel = require './editor_view_model.coffee'
 storage = require('./storage.coffee')
@@ -34,8 +35,16 @@ class AccessViewModel
     @html = wx.property '<access></access>'
     @search = wx.property ''
     @list = wx.list()
+    @previewHtml = wx.property ''
     @open = wx.command (meta) =>
+      storage.open(meta.uuid).subscribe (packet) =>
+        switch packet.type
+          when 'content'
+            @previewHtml(marked(packet.content.toString()))
+
+    @edit = wx.command (meta) =>
       wx.messageBus.sendMessage meta, 'open'
+
     @listAdd = wx.command (meta) =>
       meta.title = 'no title' unless meta.title
       @list.push meta
@@ -71,7 +80,7 @@ class AccessViewModel
 
   previewObservable: ->
     # FIXME: preview に対応する
-    Rx.Observable.empty()
+    @previewHtml.changed
 
   titleObservable: ->
     Rx.Observable.just('access')
@@ -286,8 +295,10 @@ wx.app.component 'access',
 </div>
 <table>
   <tbody data-bind="foreach: list">
-    <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
-      <td data-bind="text: title"></td><td data-bind=""><i class="fa fa-edit"></i></td><td data-bind=""><i class="fa fa-sticky-note"></i></td>
+    <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}">
+      <td data-bind="text: title"></td>
+      <td data-bind="command: {command: $parent.edit, parameter: $data}"><i class="fa fa-edit"></i></td>
+      <td data-bind="text: createdAt"></td>
     </tr>
   </tbody>
 </table>
