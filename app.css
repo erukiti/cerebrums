@@ -113,3 +113,7 @@ html {
 .pane {
   float: left;
 }
+
+.views {
+  overflow: scroll;
+}

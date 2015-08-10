@@ -11,7 +11,7 @@ class EditorViewModel
     @isDirty = wx.property false
     @html = wx.property '<editor></editor>'
 
-    @meta = {}
+    @meta = {title: ''}
     @content = ''
 
     _save = Rx.Observable.create (obs) =>
@@ -36,11 +36,14 @@ class EditorViewModel
       ipc.on 'message', (ev, arg) =>
         switch ev.type
           when 'save'
-            obs.onNext
-              type: 'save'
-              meta: @meta
-              content: @content
-            @isDirty(false)
+            if @isDirty()
+              obs.onNext
+                type: 'save'
+                meta: @meta
+                content: @content
+              @isDirty(false)
+            else
+              wx.messageBus.sendMessage 'no saved', 'status-bar'
 
     storageObs = if uuid
       storage.open(uuid, _save)

@@ -36,22 +36,26 @@ class AccessViewModel
     @list = wx.list()
     @open = wx.command (meta) =>
       wx.messageBus.sendMessage meta, 'open'
+    @listAdd = wx.command (meta) =>
+      meta.title = 'no title' unless meta.title
+      @list.push meta
+    , this
 
     @search.changed.subscribe (query) =>
       if query
         @list.clear()
         storage.search(query).subscribe (meta) =>
-          @list.push meta
+          @listAdd.execute meta
       else
         @list.clear()
         storage.getRecent().subscribe (meta) =>
-          @list.push meta
+          @listAdd.execute meta
 
   onChanged: ->
     unless @search()
       @list.clear()
       storage.getRecent().subscribe (meta) =>
-        @list.push meta
+        @listAdd.execute meta
 
   setHeight: (height) ->
     @elem.style.height = "#{height}px"
@@ -283,7 +287,7 @@ wx.app.component 'access',
 <table>
   <tbody data-bind="foreach: list">
     <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
-      <td data-bind="text: title"></td>
+      <td data-bind="text: title"></td><td data-bind=""><i class="fa fa-edit"></i></td><td data-bind=""><i class="fa fa-sticky-note"></i></td>
     </tr>
   </tbody>
 </table>

@@ -54,10 +54,13 @@ class Storage
 
   create: (writeObservable) ->
     Rx.Observable.create (subscriber) =>
-      @_write(@rawDriver, uuidv4(), writeObservable, subscriber)
+      uuid = uuidv4()
+      console.log "create: #{uuid}"
+      @_write(@rawDriver, uuid, writeObservable, subscriber)
 
   open: (uuid, writeObservable) ->
     Rx.Observable.create (subscriber) =>
+      console.log "open: #{uuid}"
       @rawDriver.readPointer(uuid).subscribe (metaHash) =>
         @rawDriver.readBlob(metaHash).subscribe (metaMsgpack) =>
           meta = msgpack.decode(metaMsgpack)

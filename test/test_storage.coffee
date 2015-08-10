@@ -216,4 +216,3 @@ describe 'Storage', ->
     assert stubReadBlob.called
 
 
-
