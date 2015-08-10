@@ -28,9 +28,8 @@ class RawDriver
   getAllPointer: =>
     Rx.Observable.create (obs) =>
       @rxfs.readDir("#{@conf.basePath}/pointer").subscribe((dirs) =>
-        dirs = for dir in dirs
-          dir.substr("#{@conf.basePath}/pointer/".length)
-        obs.onNext(dirs)
+        for dir in dirs
+          obs.onNext(dir.substr("#{@conf.basePath}/pointer/".length))
         obs.onCompleted()
       , (err) =>
         if err.code == 'ENOENT'

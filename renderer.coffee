@@ -1,8 +1,8 @@
 marked = require 'marked'
 ipc = require 'ipc'
-remote = require 'remote'
 
 EditorViewModel = require './editor_view_model.coffee'
+storage = require('./storage.coffee')
 
 class PreviewViewModel
   constructor: ->
@@ -33,10 +33,15 @@ class AccessViewModel
     @uuid = "access-view"
     @html = wx.property '<access></access>'
     @recent = wx.list()
-    remote.require('./storage.coffee').getRecent().subscribe (meta) =>
+    storage.getRecent().subscribe (meta) =>
       @recent.push meta
     @open = wx.command (meta) =>
       wx.messageBus.sendMessage meta, 'open'
+
+  onChanged: ->
+    @recent.clear()
+    storage.getRecent().subscribe (meta) =>
+      @recent.push meta
 
   setHeight: (height) ->
     @elem.style.height = "#{height}px"
@@ -64,6 +69,10 @@ class PaneViewModel
     @tabView = wx.property null
     @tabChange = wx.command (tab) =>
       @tabView(tab.view)
+
+    @tabView.changed.subscribe (tabView) ->
+      if tabView.onChanged
+        tabView.onChanged()
 
     # @previewObservable = Rx.Observable.create (obs) =>
     #   @views.listChanged.subscribe (flags) =>

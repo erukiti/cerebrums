@@ -17,7 +17,7 @@ class Storage
           meta = msgpack.decode(metaMsgpack)
           meta.uuid = uuid
           @rawDriver.readBlob(meta.sha256).map (content) =>
-            {meta: meta, text: content}
+            {meta: meta, text: content.toString('utf-8')}
     .toArray()
     .subscribe (docs) =>
       @searcher = new Searcher(docs)

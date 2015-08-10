@@ -1,6 +1,7 @@
 marked = require 'marked'
-remote = require 'remote'
 ipc = require 'ipc'
+
+storage = require('./storage.coffee')
 
 class EditorViewModel
   constructor: (uuid) ->
@@ -12,8 +13,6 @@ class EditorViewModel
 
     @meta = {}
     @content = ''
-
-    storage = require('./storage.coffee')
 
     _save = Rx.Observable.create (obs) =>
       @title.changed.subscribe (title) =>
@@ -89,44 +88,6 @@ class EditorViewModel
   previewObservable: ->
     @text.changed.merge(Rx.Observable.just(@text())).map (text) ->
       marked(text)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   titleObservable: ->
     @title.changed.merge(Rx.Observable.just(''))

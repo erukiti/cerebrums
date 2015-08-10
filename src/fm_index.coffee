@@ -32,16 +32,18 @@ class FmIndex
     @usedChars = []
     n = 2
     for doc in documents
-      for ch in doc.text
-        @usedChars[ch.charCodeAt(0)] = n++ unless @usedChars[ch.charCodeAt(0)]
+      if doc.text
+        for ch in doc.text
+          @usedChars[ch.charCodeAt(0)] = n++ unless @usedChars[ch.charCodeAt(0)]
 
     s = []
     @metaArray = []
     for doc in documents
-      for ch in doc.text
-        s.push @usedChars[ch.charCodeAt(0)]
-      s.push 1
-      @metaArray.push {uuid: doc.uuid}
+      if doc.text
+        for ch in doc.text
+          s.push @usedChars[ch.charCodeAt(0)]
+        s.push 1
+        @metaArray.push {uuid: doc.uuid}
     s.pop() # 最後の1を捨てる
     s.push 0
 
