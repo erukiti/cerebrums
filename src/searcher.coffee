@@ -21,6 +21,7 @@ class Searcher
   add: (meta, text) ->
     @docsText[meta.uuid] = {uuid: meta.uuid, text: text}
     @docsText[meta.uuid] = {uuid: meta.uuid, text: meta.title}
+    @docsUpdatedAt[meta.uuid] = {meta:meta}
 
     console.time('searcher index create')
     @fmIndexText = new FmIndex(_.map(@docsText, (docs) -> docs))
@@ -34,7 +35,7 @@ class Searcher
     for result in @fmIndexTitle.search(q, 50).results
       results[result.uuid] = result.uuid
 
-    _.map(results, (uuid) -> uuid).sort()
+    _.map(_.map(results, (uuid) => uuid).sort(), (uuid) => @docsUpdatedAt[uuid].meta)
 
   getRecent: ->
     _.map(_.sortBy(_.map(@docsUpdatedAt, (doc) -> doc), (doc) -> -doc.meta.updatedAt), (doc) -> doc.meta)

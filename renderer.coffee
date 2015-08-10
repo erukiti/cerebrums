@@ -32,16 +32,26 @@ class AccessViewModel
   constructor: ->
     @uuid = "access-view"
     @html = wx.property '<access></access>'
-    @recent = wx.list()
-    storage.getRecent().subscribe (meta) =>
-      @recent.push meta
+    @search = wx.property ''
+    @list = wx.list()
     @open = wx.command (meta) =>
       wx.messageBus.sendMessage meta, 'open'
 
+    @search.changed.subscribe (query) =>
+      if query
+        @list.clear()
+        storage.search(query).subscribe (meta) =>
+          @list.push meta
+      else
+        @list.clear()
+        storage.getRecent().subscribe (meta) =>
+          @list.push meta
+
   onChanged: ->
-    @recent.clear()
-    storage.getRecent().subscribe (meta) =>
-      @recent.push meta
+    unless @search()
+      @list.clear()
+      storage.getRecent().subscribe (meta) =>
+        @list.push meta
 
   setHeight: (height) ->
     @elem.style.height = "#{height}px"
@@ -267,8 +277,11 @@ wx.app.component 'editor',
 
 wx.app.component 'access',
   template: '
+<div>
+  search: <input type="text" class="search" data-bind="textinput: @search" placeholder="検索ワード">
+</div>
 <table>
-  <tbody data-bind="foreach: recent">
+  <tbody data-bind="foreach: list">
     <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
       <td data-bind="text: title"></td>
     </tr>

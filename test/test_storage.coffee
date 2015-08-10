@@ -208,8 +208,8 @@ describe 'Storage', ->
     stubReadBlob.withArgs('6666').returns(Rx.Observable.just('fuga fuga'))
 
     storage = new Storage(dummyRawDriver)
-    storage.search('hoge').subscribe (x) ->
-      assert.deepEqual x, ['1111']
+    storage.search('hoge').toArray().subscribe (x) ->
+      assert.deepEqual x, [meta1]
 
     assert stubGetAllPointer.calledOnce
     assert stubReadPointer.calledTwice

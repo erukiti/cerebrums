@@ -83,7 +83,8 @@ class Storage
 
   search: (query) ->
     Rx.Observable.create (subscriber) =>
-      subscriber.onNext(@searcher.search(query))
-      subscriber.onCompleted
+      for meta in @searcher.search(query)
+        subscriber.onNext(meta)
+      subscriber.onCompleted()
 
 module.exports = Storage
