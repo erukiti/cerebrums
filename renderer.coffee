@@ -98,9 +98,31 @@ class PaneViewModel
     @tabChange = wx.command (tab) =>
       @tabView(tab.view)
 
-    @tabView.changed.subscribe (tabView) ->
+    @tabView.changed.subscribe (tabView) =>
       if tabView.onChanged
         tabView.onChanged()
+
+    @closeView = wx.command (tabView) =>
+      tabView = @tabView() unless tabView
+      console.dir "close"
+      console.dir tabView
+      # view に close してもいいかお伺いを立てる
+
+      # 最後の tab の時に削除するかどうか
+
+      i = 0
+      for tab in @tabs.toArray()
+        if tab.view == tabView
+          @tabs.remove(tab)
+          @views.remove(tabView)
+          break
+        i++
+
+      i-- if i >= @tabs.length && i >= 0
+      console.dir i
+      console.dir @tabs.get(i)
+      @tabView(@tabs.get(i).view)
+
 
     # @previewObservable = Rx.Observable.create (obs) =>
     #   @views.listChanged.subscribe (flags) =>
@@ -125,18 +147,6 @@ class PaneViewModel
     #   @tabView.changed.subscribe (view) =>
     #     view.previewObservable().subscribe (html) =>
     #       obs.onNext(html)
-
-  closeView: () ->
-    # view に close してもいいかお伺いを立てる
-
-    for tab in @tabs.toArray()
-      if tab.view == @tabView()
-        @tabs.remove(tab)
-        break
-
-    @views.remove(@tabView())
-
-    @tabView(@tabs.get(@tabs.length - 1))
 
   searchView: (uuid) ->
     for view in @views.toArray()
@@ -233,7 +243,7 @@ class MainViewModel
     ipc.on 'message', (ev, arg) =>
       switch ev.type
         when 'close'
-          @panes.get(0).closeView()
+          @panes.get(0).closeView.execute()
         when 'tab'
           @addView(new EditorViewModel(), 0)
         when 'access'
@@ -280,7 +290,7 @@ class MainViewModel
 wx.app.component 'pane',
   template: '
 <div class="tabs" data-bind="foreach: tabs">
-  <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
+  <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}"><span data-bind="text: tabTitle"></span> <i class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"></i></div>
 </div>
 <div class="views" data-bind="foreach: views">
   <div data-bind="visible: $data == $parent.tabView, html: html"></div>

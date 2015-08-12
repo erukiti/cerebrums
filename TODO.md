@@ -53,8 +53,8 @@ application
 * [ ] preview view の word-wrap を有効にする
 * タブ
 	- [ ] タブの見た目を整える
-	- [ ] タブを閉じるボタン
-	- [ ] タブを閉じるときにうまく preview を更新する
+	- [x] タブを閉じるボタン
+	- [ ] タブを閉じるときにうまく view / preview を更新する
 	- [ ] タブをDnDで移動する
 	- [ ] 新規タブボタンを tab bar に表示する
 * access view を強化する

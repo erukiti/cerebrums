@@ -105,6 +105,13 @@ html {
 
 .tab {
   display: inline;
+  margin-right: 10px;
+  margin-left: 10px;
+  word-wrap: normal;
+}
+
+.tabText {
+  display: inline;
 }
 
 #panes {
