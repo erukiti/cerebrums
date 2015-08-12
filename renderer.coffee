@@ -1,6 +1,7 @@
 marked = require 'marked'
 ipc = require 'ipc'
 marked = require 'marked'
+sprintf = require("sprintf-js").sprintf
 
 EditorViewModel = require './editor_view_model.coffee'
 storage = require('./storage.coffee')
@@ -46,7 +47,11 @@ class AccessViewModel
       wx.messageBus.sendMessage meta, 'open'
 
     @listAdd = wx.command (meta) =>
+      dateFormat = (date) ->
+        sprintf "%4d/%02d/%02d %02d:%02d:%02d", date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()
       meta.title = 'no title' unless meta.title
+      meta.createdAt = dateFormat(new Date(meta.createdAt))
+      meta.updatedAt = dateFormat(new Date(meta.updatedAt))
       @list.push meta
     , this
 
@@ -296,9 +301,10 @@ wx.app.component 'access',
 <table>
   <tbody data-bind="foreach: list">
     <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}">
-      <td data-bind="text: title"></td>
-      <td data-bind="command: {command: $parent.edit, parameter: $data}"><i class="fa fa-edit"></i></td>
-      <td data-bind="text: createdAt"></td>
+      <td class="access_title" data-bind="text: title"></td>
+    </tr>
+    <tr style="left">
+      <td><i class="fa fa-edit" data-bind="command: {command: $parent.edit, parameter: $data}"></i><span data-bind="text: updatedAt"></span></td>
     </tr>
   </tbody>
 </table>

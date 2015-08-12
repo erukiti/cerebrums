@@ -35,6 +35,9 @@ application
 		* [ ] class の外に散らばってるロジックを class におさめる
 		* [ ] panes.get() の決め打ちをなくす
 	- pane0/pane1 をそれぞれ決め打ちしてる状況をやめる
+* [ ] 足回りに遅延処理を導入する
+	- [ ] 検索インデックス作成
+* [ ] FmIndex#decodeAll
 
 * [ ] split bar
     - [ ] pane と pane の間に bar を作成する
@@ -66,9 +69,6 @@ application
 * [ ] window resize 情報をセーブ / ロード
 * [ ] テンポラリ保存
 
-* [ ] 足回りに遅延処理を導入する
-	- [ ] 検索インデックス作成
-* [ ] FmIndex#decodeAll
 
 * アプリケーション名変更
 * css
