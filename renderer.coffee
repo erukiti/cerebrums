@@ -95,8 +95,19 @@ class PaneViewModel
     @tabs = wx.list()
     @views = wx.list()
     @tabView = wx.property null
-    @tabChange = wx.command (tab) =>
-      @tabView(tab.view)
+    @tabChange = wx.command (tabView) =>
+      for _tab in @tabs.toArray()
+        console.dir _tab
+        if _tab.view == tabView
+          _tab.klass 'tabSelected'
+        else
+          _tab.klass 'tab'
+
+      console.dir tabView
+      @tabView(tabView)
+    , this
+
+    @opendList = wx.list()
 
     @tabView.changed.subscribe (tabView) =>
       if tabView.onChanged
@@ -115,13 +126,31 @@ class PaneViewModel
         if tab.view == tabView
           @tabs.remove(tab)
           @views.remove(tabView)
+          @opendList.remove(tabView.uuid)
           break
         i++
 
       i-- if i >= @tabs.length && i >= 0
       console.dir i
       console.dir @tabs.get(i)
-      @tabView(@tabs.get(i).view)
+      @tabChange.execute(@tabs.get(i).view)
+
+  new: (uuid) =>
+    if @opendList.contains(uuid)
+        view = @panes.get(0).searchView(uuid)
+      else
+        switch uuid
+          when 'access-view'
+            view = new AccessViewModel()
+          when 'preview-view'
+            view = new PreviewViewModel()
+          else
+            view = new EditorViewModel(uuid)
+
+        @addView(view, 0)
+        @opendList.push uuid
+
+      @tabChange.execute(view)
 
 
     # @previewObservable = Rx.Observable.create (obs) =>
@@ -156,11 +185,11 @@ class PaneViewModel
 
   addView: (view) ->
     n = @tabs.length()
-    tab = {tabTitle: wx.property(''), view: view}
+    tab = {tabTitle: wx.property(''), view: view, klass: wx.property 'tab'}
 
     @tabs.push tab
     @views.push view
-    @tabView(view) if @tabView() == null
+    @tabChange.execute(view) if @tabView() == null
 
     @elemViews.children[n].id = "view#{n}"
     view.setId n
@@ -223,38 +252,22 @@ class MainViewModel
     @statusBarElem = document.getElementById 'statusbar'
     @id = wx.property 0
 
-    @opendList = wx.list()
-
     # @focusedPane = 
 
     for n in [0...nPanes]
       @addPane()
 
     wx.messageBus.listen('open').subscribe (meta) =>
-      if @opendList.contains(meta.uuid)
-        view = @panes.get(0).searchView(meta.uuid)
-      else
-        view = new EditorViewModel(meta.uuid)
-        @addView(view, 0)
-        @opendList.push meta.uuid
-
-      @panes.get(0).tabView(view) if view
+      @panes.get(0).new(meta.uuid)
 
     ipc.on 'message', (ev, arg) =>
       switch ev.type
         when 'close'
           @panes.get(0).closeView.execute()
         when 'tab'
-          @addView(new EditorViewModel(), 0)
+          @panes.get(0).new()
         when 'access'
-          for view in @panes.get(0).views.toArray()
-            if view.uuid == 'access-view'
-              @panes.get(0).tabView(view)
-              return
-
-          view = new AccessViewModel()
-          @addView(view, 0)
-          @panes.get(0).tabView(view)
+          @panes.get(0).new('access-view')
 
     wx.messageBus.listen('status-bar').subscribe (msg) =>
       @status(msg)
@@ -290,7 +303,9 @@ class MainViewModel
 wx.app.component 'pane',
   template: '
 <div class="tabs" data-bind="foreach: tabs">
-  <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}"><span data-bind="text: tabTitle"></span> <i class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"></i></div>
+  <div data-bind="command: {command: $parent.tabChange, parameter: $data.view}, css: klass">
+    <span data-bind="text: tabTitle"></span> <i class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"></i>
+  </div>
 </div>
 <div class="views" data-bind="foreach: views">
   <div data-bind="visible: $data == $parent.tabView, html: html"></div>
