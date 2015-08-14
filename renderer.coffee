@@ -246,6 +246,7 @@ class PaneViewModel
 class MainViewModel
   constructor: (nPanes) ->
     @panes = wx.list()
+    @separaters = wx.list()
     @status = wx.property 'statusbar'
 
     @panesElem = document.getElementById 'panes'
@@ -275,11 +276,12 @@ class MainViewModel
   addPane: ->
     pane = new PaneViewModel()
     @panes.push pane
-    n = @panesElem.children.length - 1
+    n = @panesElem.children.length - 2
     @panesElem.children[n].id = "pane#{n}"
     pane.setId n
     pane.setElement @panesElem.children[n]
     # setHeight
+    @separaters.push @panesElem.children[n + 1]
 
   addView: (viewModel, n) ->
     @panes.get(n).addView(viewModel)
@@ -293,9 +295,23 @@ class MainViewModel
 
   setWidth: (width) ->
     @panesElem.style.width = "#{width}px"
+    paneWidth = Math.floor(width / @panes.length())
+    console.dir paneWidth
+    x = 0
     for n in [0...@panes.length()]
-      @panes.get(n).setWidth width / @panes.length()
-      @panes.get(n).setX width / @panes.length() * n
+      w = Math.min(paneWidth, width)
+      @panes.get(n).setWidth w
+      @panes.get(n).setX x
+
+      if n < @panes.length() - 1
+        @separaters.get(n).style.width = "1px"
+        @separaters.get(n).style.x = x + w
+        w += 1
+      else
+        @separaters.get(n).style.width = "0"
+      width -= w
+      x += w
+
 
   getView: (n) ->
     @panes.get(n).getView()

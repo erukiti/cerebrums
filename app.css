@@ -118,11 +118,18 @@ html {
 .tabSelected {
   font-weight: bold;
   background-color: #282a36;
-  
+
   display: inline;
   margin-right: 10px;
   margin-left: 10px;
   word-wrap: normal;
+}
+
+.separater {
+  width 0;
+  height: 100%;
+  background-color: red;
+  float: left;
 }
 
 .tabText {

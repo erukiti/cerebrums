@@ -7,42 +7,12 @@
 
 <body>
 
-<!--       <ul data-bind="foreach: views">
-        <editor></editor>
-      </ul>
- -->
-
     <div data-bind="foreach: {data: panes, hooks: hooks}" id="panes">
       <pane class="pane"></pane>
+      <div class="separater"></div>
     </div>
     <div id="statusbar" data-bind="text: status">hoge</div>
 
-<!-- 
-    <div id="main" data-bind="visible: false">
-      <div id="tabs1" data-bind="foreach: tabs1">
-        <div class="tab" data-bind="command: {command: $parent.tabChange, parameter: $data}, text: tabTitle"></div>
-      </div>
-      <div id="tabs2"><div class="tab" id="tab2-1">プレビュー</div></div>
-      <div id="pane1">
-        <div  data-bind="visible: tabs1_index == 1">
-          <input type="text" class="titleEditor" id="titleEditor1" data-bind="textinput: @title" placeholder="タイトル">
-          <textarea class="editor" id="editor1" data-bind="textinput: @editor, event: {keydown: pressKey}"></textarea>
-        </div>
-        <div data-bind="visible: tabs1_index == 2">
-          <table>
-            <tbody data-bind="foreach: recent">
-              <tr data-bind="event: {click: {command: $parent.open, parameter: $data}}">
-                <td data-bind="text: title"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div id="pane2">
-        <div id="viewer" data-bind="html: viewer"></div>
-      </div>
-    </div>
- -->
 	  <script>
       window.onerror = function(message, file, line, column, err) {
         console.dir(err.stack);
