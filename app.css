@@ -141,6 +141,10 @@ html {
 
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .selectedAccessList {
   background-color: #282a36;
   color: #ffffff;
