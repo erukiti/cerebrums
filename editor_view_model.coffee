@@ -65,9 +65,13 @@ class EditorViewModel
           console.dir packet
 
   setHeight: (height) ->
+    unless @elemTitleEditor.offsetHeight
+      # Fixme: work a round.
+      console.warn "EditorViewModel#setHeight: @elemTitleEditor.offsetHeight is unknown"
+      return
     @height = height
     @elem.style.height = "#{height}px"
-
+    # console.log "EditorViewModel#setHeight: #{@elemTitleEditor.offsetHeight}"
     @elemEditor.style.height = "#{height - @elemTitleEditor.offsetHeight}px"
 
   setWidth: (width) ->

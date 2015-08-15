@@ -97,13 +97,11 @@ class PaneViewModel
     @tabView = wx.property null
     @tabChange = wx.command (tabView) =>
       for _tab in @tabs.toArray()
-        console.dir _tab
         if _tab.view == tabView
           _tab.klass 'tabSelected'
         else
           _tab.klass 'tab'
 
-      console.dir tabView
       @tabView(tabView)
     , this
 
@@ -115,9 +113,9 @@ class PaneViewModel
 
     @closeView = wx.command (tabView) =>
       tabView = @tabView() unless tabView
-      console.dir "close"
-      console.dir tabView
       # view に close してもいいかお伺いを立てる
+
+      return unless tabView
 
       # 最後の tab の時に削除するかどうか
 
@@ -131,12 +129,10 @@ class PaneViewModel
         i++
 
       i-- if i >= @tabs.length && i >= 0
-      console.dir i
-      console.dir @tabs.get(i)
-      @tabChange.execute(@tabs.get(i).view)
+      @tabChange.execute(@tabs.get(i).view) if @tabs.length > 0
 
   new: (uuid) =>
-    if @opendList.contains(uuid)
+    if uuid && @opendList.contains(uuid)
         view = @panes.get(0).searchView(uuid)
       else
         switch uuid
@@ -147,10 +143,13 @@ class PaneViewModel
           else
             view = new EditorViewModel(uuid)
 
-        @addView(view, 0)
+        @addView(view)
         @opendList.push uuid
 
       @tabChange.execute(view)
+      @setHeight()
+      @setWidth()
+      # Fixme: このタイミングじゃないと正しく setHeight()できない？
 
 
     # @previewObservable = Rx.Observable.create (obs) =>
@@ -189,7 +188,6 @@ class PaneViewModel
 
     @tabs.push tab
     @views.push view
-    @tabChange.execute(view) if @tabView() == null
 
     @elemViews.children[n].id = "view#{n}"
     view.setId n
@@ -208,8 +206,15 @@ class PaneViewModel
     .subscribe (title) ->
       tab.tabTitle(title)
 
+    @tabChange.execute(view) if @tabView() == null
+
   setWidth: (width) ->
-    @width = width
+    return if !width && !@width
+
+    if width
+      @width = width
+    else
+      width = @width
     @elem.style.width = "#{width}px"
     @views.forEach (view) ->
       view.setWidth width
@@ -221,8 +226,13 @@ class PaneViewModel
     @elem.style.y = y
 
   setHeight: (height) ->
+    return if !height && !@height
+
+    if height
+      @height = height
+    else
+      height = @height
     @elem.style.height = "#{height}px"
-    @height = height
     height -= @elemTabs.offsetHeight
     @views.forEach (view) ->
       view.setHeight height
@@ -296,7 +306,6 @@ class MainViewModel
   setWidth: (width) ->
     @panesElem.style.width = "#{width}px"
     paneWidth = Math.floor(width / @panes.length())
-    console.dir paneWidth
     x = 0
     for n in [0...@panes.length()]
       w = Math.min(paneWidth, width)
@@ -342,10 +351,10 @@ wx.app.component 'access',
 <table>
   <tbody data-bind="foreach: list">
     <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}">
-      <td class="access_title" data-bind="text: title"></td>
+      <td class="access_title"><span data-bind="text: title"></span></td>
     </tr>
-    <tr style="left">
-      <td><i class="fa fa-edit" data-bind="command: {command: $parent.edit, parameter: $data}"></i><span data-bind="text: updatedAt"></span></td>
+    <tr style="text-align: right">
+      <td class="access_info"><i class="fa fa-edit" data-bind="command: {command: $parent.edit, parameter: $data}"></i><span data-bind="text: updatedAt"></span></td>
     </tr>
   </tbody>
 </table>
@@ -357,9 +366,12 @@ wx.applyBindings(mainViewModel)
 
 mainViewModel.addPane()
 mainViewModel.addPane()
-mainViewModel.addView(new EditorViewModel(), 0)
-mainViewModel.addView(new AccessViewModel(), 0)
-mainViewModel.addView(new PreviewViewModel(), 1)
+
+# mainViewModel.addView(new EditorViewModel(), 0)
+# mainViewModel.addView(new AccessViewModel(), 0)
+# mainViewModel.addView(new PreviewViewModel(), 1)
+mainViewModel.panes.get(0).new()
+mainViewModel.panes.get(1).new('preview-view')
 
 # mainViewModel.panes.get(0).previewObservable.subscribe (html) ->
 mainViewModel.panes.get(0).tabView.changed.merge(Rx.Observable.just(mainViewModel.panes.get(0).tabView())).subscribe (view) =>

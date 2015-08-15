@@ -40,7 +40,7 @@ application
 * [ ] FmIndex#decodeAll
 
 * [ ] split bar
-    - [ ] pane と pane の間に bar を作成する
+    - [x] pane と pane の間に bar を作成する
     - [ ] barを動かせるようにする
 * [ ] tab キーの挙動を変える
 * [ ] エディタの末尾でスペースやtabを入力しても駄目な現象の解明

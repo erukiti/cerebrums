@@ -149,7 +149,10 @@ html {
 
 .access_title {
   font-size: 1.5em;
-  width: 100%;
+}
+
+.access_info {
+  font-size: 0.75em;
 }
 
 .search {
