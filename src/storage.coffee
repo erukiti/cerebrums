@@ -56,6 +56,7 @@ class Storage
     Rx.Observable.create (subscriber) =>
       uuid = uuidv4()
       console.log "create: #{uuid}"
+      subscriber.onNext {type: 'uuid', uuid: uuid}
       @_write(@rawDriver, uuid, writeObservable, subscriber)
 
   open: (uuid, writeObservable) ->

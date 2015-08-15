@@ -1,5 +1,9 @@
 marked = require 'marked'
 ipc = require 'ipc'
+remote = require 'remote'
+app = remote.require 'app'
+BrowserWindow = remote.require 'browser-window'
+dialog = remote.require 'dialog'
 
 storage = require('./storage.coffee')
 
@@ -13,6 +17,11 @@ class EditorViewModel
 
     @meta = {title: ''}
     @content = ''
+
+    ipc.on 'message', (ev, arg) =>
+      switch ev.type
+        when 'save'
+          wx.messageBus.sendMessage @uuid, 'save'
 
     _save = Rx.Observable.create (obs) =>
       @title.changed.subscribe (title) =>
@@ -33,17 +42,18 @@ class EditorViewModel
           meta: @meta
           content: @content
 
-      ipc.on 'message', (ev, arg) =>
-        switch ev.type
-          when 'save'
-            if @isDirty()
-              obs.onNext
-                type: 'save'
-                meta: @meta
-                content: @content
-              @isDirty(false)
-            else
-              wx.messageBus.sendMessage 'no saved', 'status-bar'
+      wx.messageBus.listen('save').subscribe (uuid) =>
+        console.dir uuid
+        console.dir @uuid
+        return if uuid != @uuid
+        if @isDirty()
+          obs.onNext
+            type: 'save'
+            meta: @meta
+            content: @content
+          @isDirty(false)
+        else
+          wx.messageBus.sendMessage 'no saved', 'status-bar'
 
     storageObs = if uuid
       storage.open(uuid, _save)
@@ -61,6 +71,9 @@ class EditorViewModel
           @text(@content)
         when 'saved'
           wx.messageBus.sendMessage "saved", 'status-bar'
+        when 'uuid'
+          console.log packet.uuid
+          @uuid = packet.uuid
         else
           console.dir packet
 
@@ -98,5 +111,29 @@ class EditorViewModel
 
   titleObservable: ->
     @title.changed.merge(Rx.Observable.just(''))
+
+  closeOk: ->
+    return true unless @isDirty()
+
+    opt =
+      title: 'close tab'
+      type: 'warning'
+      buttons: ['Save', 'Cancel', 'Don\'t save']
+      message: "Do you want to save the changes?\n" + "Your changes will be lost if you don't save them."
+
+    win = BrowserWindow.getFocusedWindow()
+    result = dialog.showMessageBox win, opt
+    console.log result
+    switch result
+      when 0
+        console.log '0'
+        wx.messageBus.sendMessage @uuid, 'save'
+        true
+      when 1
+        console.log '1'
+        false
+      when 2
+        console.log '2'
+        true
 
 module.exports = EditorViewModel

@@ -1,6 +1,5 @@
 marked = require 'marked'
 ipc = require 'ipc'
-marked = require 'marked'
 sprintf = require("sprintf-js").sprintf
 
 EditorViewModel = require './editor_view_model.coffee'
@@ -30,6 +29,9 @@ class PreviewViewModel
   titleObservable: ->
     Rx.Observable.just('preview')
 
+  closeOk: ->
+    false
+
 class AccessViewModel
   constructor: ->
     @uuid = "access-view"
@@ -43,6 +45,12 @@ class AccessViewModel
           when 'content'
             @previewHtml(marked(packet.content.toString()))
 
+      for _meta in @list.toArray()
+        if _meta == meta
+          _meta.klass 'selectedAccessList'
+        else
+          _meta.klass 'accessList'
+
     @edit = wx.command (meta) =>
       wx.messageBus.sendMessage meta, 'open'
 
@@ -52,6 +60,7 @@ class AccessViewModel
       meta.title = 'no title' unless meta.title
       meta.createdAt = dateFormat(new Date(meta.createdAt))
       meta.updatedAt = dateFormat(new Date(meta.updatedAt))
+      meta.klass = wx.property 'accessList'
       @list.push meta
     , this
 
@@ -90,6 +99,9 @@ class AccessViewModel
   titleObservable: ->
     Rx.Observable.just('access')
 
+  closeOk: ->
+    true
+
 class PaneViewModel
   constructor: (params) ->
     @tabs = wx.list()
@@ -113,7 +125,8 @@ class PaneViewModel
 
     @closeView = wx.command (tabView) =>
       tabView = @tabView() unless tabView
-      # view に close してもいいかお伺いを立てる
+
+      return unless tabView.closeOk()
 
       return unless tabView
 
@@ -344,21 +357,21 @@ wx.app.component 'editor',
 '
 
 wx.app.component 'access',
-  template: '
+  template: '''
 <div>
   search: <input type="text" class="search" data-bind="textinput: @search" placeholder="検索ワード">
 </div>
 <table>
   <tbody data-bind="foreach: list">
-    <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}">
+    <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}, css: klass">
       <td class="access_title"><span data-bind="text: title"></span></td>
     </tr>
-    <tr style="text-align: right">
-      <td class="access_info"><i class="fa fa-edit" data-bind="command: {command: $parent.edit, parameter: $data}"></i><span data-bind="text: updatedAt"></span></td>
+    <tr style="text-align: right" data-bind="css: klass">
+      <td class="access_info"><i class="fa fa-edit" data-bind="command: {command: $parent.edit, parameter: $data}"></i> <span data-bind="text: updatedAt"></span></td>
     </tr>
   </tbody>
 </table>
-'
+'''
 
 mainViewModel = new MainViewModel(0)
 
@@ -385,3 +398,9 @@ mainViewModel.panes.get(0).tabView.changed.merge(Rx.Observable.just(mainViewMode
 Rx.Observable.fromEvent(window, 'resize').merge(Rx.Observable.just(null)).subscribe (ev) =>
   mainViewModel.setHeight(window.innerHeight)
   mainViewModel.setWidth(window.innerWidth)
+
+Rx.Observable.fromEvent(window, 'resize').subscribe (ev) =>
+  ipc.send 'window-resize', {height: window.outerHeight, width: window.outerWidth}
+  # console.dir window.screenX
+  # console.dir window.screenY
+

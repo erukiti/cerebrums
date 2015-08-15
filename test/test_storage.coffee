@@ -76,7 +76,11 @@ describe 'Storage', ->
       storage.create(writeObservable).subscribe (x) ->
         result.push x
 
-      assert.deepEqual result, [{type: 'saved'}, {type: 'saved'}]
+      assert result.length == 3
+      assert result[0].type == 'uuid'
+      assert result[1].type == 'saved'
+      assert result[2].type == 'saved'
+
       dummyRawDriver.verify()
 
       clock.restore()

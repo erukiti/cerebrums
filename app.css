@@ -110,18 +110,19 @@ html {
 
 .tab {
   display: inline;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-right: 8px;
+  margin-left: 8px;
   word-wrap: normal;
 }
 
 .tabSelected {
   font-weight: bold;
   background-color: #282a36;
+  color: #ffffff;
 
   display: inline;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-right: 8px;
+  margin-left: 8px;
   word-wrap: normal;
 }
 
@@ -134,6 +135,15 @@ html {
 
 .tabText {
   display: inline;
+}
+
+.accessList {
+
+}
+
+.selectedAccessList {
+  background-color: #282a36;
+  color: #ffffff;
 }
 
 #panes {
