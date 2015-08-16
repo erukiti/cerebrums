@@ -16,6 +16,11 @@
 
 }
 
+.tagEditor {
+  font-size: 0.8em;
+  width: 90%;
+}
+
 .titleEditor {
   width: 100%;
   height: 1.2em;

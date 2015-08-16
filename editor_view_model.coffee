@@ -14,9 +14,17 @@ class EditorViewModel
     @text = wx.property ''
     @isDirty = wx.property false
     @html = wx.property '<editor></editor>'
+    @star = wx.property '☆'
+    @tags = wx.property ''
 
-    @meta = {title: ''}
+    @meta = {title: '', tags: '', star: '0'}
     @content = ''
+
+    @clickStar = wx.command () =>
+      if (@star() == '☆')
+        @star('★')
+      else
+        @star('☆')
 
     ipc.on 'message', (ev, arg) =>
       switch ev.type
@@ -32,7 +40,29 @@ class EditorViewModel
           type: 'change'
           meta: @meta
           content: @content
-        
+      
+      @tags.changed.subscribe (tags) =>
+        @meta['tags'] = tags
+        @isDirty(true)
+
+        obs.onNext
+          type: 'change'
+          meta: @meta
+          content: @content
+
+      @star.changed.subscribe (star) =>
+        if star == '★'
+          @meta['star'] = '1'
+        else
+          @meta['star'] = '0'
+        console.dir @meta
+        @isDirty(true)
+
+        obs.onNext
+          type: 'change'
+          meta: @meta
+          content: @content
+
       @text.changed.subscribe (text) =>
         @content = text
         @isDirty(true)
@@ -65,7 +95,14 @@ class EditorViewModel
         when 'meta'
           @meta = packet
           delete @meta['type']
+          console.dir @meta
           @title(packet.title)
+          if @meta['star'] == '1'
+            @star('★')
+          else
+            @star('☆')
+          @tags(@meta['tags'])
+
         when 'content'
           @content = packet.content.toString()
           @text(@content)
@@ -85,7 +122,9 @@ class EditorViewModel
     @height = height
     @elem.style.height = "#{height}px"
     # console.log "EditorViewModel#setHeight: #{@elemTitleEditor.offsetHeight}"
-    @elemEditor.style.height = "#{height - @elemTitleEditor.offsetHeight}px"
+    height -= @elemTitleEditor.offsetHeight + @elemTagsEditor.offsetHeight
+
+    @elemEditor.style.height = "#{height}px"
 
   setWidth: (width) ->
     @width = width
@@ -95,12 +134,9 @@ class EditorViewModel
 
   setElement: (elem) ->
     @elem = elem.children[0]
-    if @elem.children[0].className == 'titleEditor'
-      @elemTitleEditor = @elem.children[0]
-      @elemEditor = @elem.children[1]
-    else
-      @elemTitleEditor = @elem.children[1]
-      @elemEditor = @elem.children[0]
+    @elemTagsEditor = @elem.children[1]
+    @elemTitleEditor = @elem.children[2]
+    @elemEditor = @elem.children[3]
 
   setId: (id) ->
     @id = id
