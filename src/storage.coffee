@@ -24,6 +24,16 @@ class Storage
 
   _write: (rawDriver, uuid, writeObservable, subscriber, prevHash) =>
     return unless writeObservable
+    w = writeObservable.filter((packet) => packet.type == 'change' || packet.type == 'save')
+    w.buffer(w.throttle(1000))
+      .map (list) => list[list.length - 1]
+      .subscribe (packet) =>
+        console.dir packet
+        packed = msgpack.encode({meta: packet.meta, content: packet.content})
+        rawDriver.writeTemp(uuid, packed).subscribe (x) =>
+          console.dir("temp saved #{uuid}")
+        , (err) => console.error err
+
     writeObservable.filter((packet) => packet.type == 'save').subscribe((packet) =>
       content = packet.content
       contentHash = sha256(content)

@@ -5,6 +5,10 @@ class RawDriver
     @rxfs = rxfs
     @conf = conf
 
+  writeTemp: (filename, file) =>
+    path = "#{@conf.basePath}/temp/#{filename}"
+    @rxfs.writeFile(path, file)
+
   writeBlob: (hash, file) =>
     path = "#{@conf.basePath}/blob/#{hash}"
     # console.log "writeBlob: #{path}"
@@ -14,6 +18,10 @@ class RawDriver
     path = "#{@conf.basePath}/pointer/#{uuid}"
     # console.log "writePointer: #{path}"
     @rxfs.writeFile(path, file)
+
+  readTemp: (filename) =>
+    path = "#{conf.basePath}/temp/#{filename}"
+    @rxfs.readFile(path)
 
   readBlob: (hash) =>
     path = "#{@conf.basePath}/blob/#{hash}"
