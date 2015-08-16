@@ -4,6 +4,7 @@ remote = require 'remote'
 app = remote.require 'app'
 BrowserWindow = remote.require 'browser-window'
 dialog = remote.require 'dialog'
+uuidv4 = require 'uuid-v4'
 
 storage = require('./storage.coffee')
 
@@ -73,8 +74,6 @@ class EditorViewModel
           content: @content
 
       wx.messageBus.listen('save').subscribe (uuid) =>
-        console.dir uuid
-        console.dir @uuid
         return if uuid != @uuid
         if @isDirty()
           obs.onNext
@@ -88,7 +87,8 @@ class EditorViewModel
     storageObs = if uuid
       storage.open(uuid, _save)
     else
-      storage.create(_save)
+      @uuid = uuidv4()
+      storage.create(@uuid, _save)
 
     storageObs.subscribe (packet) =>
       switch packet.type

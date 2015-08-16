@@ -28,7 +28,6 @@ class Storage
     w.buffer(w.throttle(1000))
       .map (list) => list[list.length - 1]
       .subscribe (packet) =>
-        console.dir packet
         packed = msgpack.encode({meta: packet.meta, content: packet.content})
         rawDriver.writeTemp(uuid, packed).subscribe (x) =>
           console.dir("temp saved #{uuid}")
@@ -62,9 +61,8 @@ class Storage
     , (err) => console.error err
     )
 
-  create: (writeObservable) ->
+  create: (uuid, writeObservable) ->
     Rx.Observable.create (subscriber) =>
-      uuid = uuidv4()
       console.log "create: #{uuid}"
       subscriber.onNext {type: 'uuid', uuid: uuid}
       @_write(@rawDriver, uuid, writeObservable, subscriber)
@@ -88,6 +86,13 @@ class Storage
 
         , (err) => subscriber.onError(err)
       , (err) => subscriber.onError(err)
+
+  tabs: (obs) ->
+    obs.subscribe (list) =>
+      packed = msgpack.encode(list)
+      @rawDriver.writeTemp('tabs', packed).subscribe (x) =>
+        ;
+      , (err) => console.error err
 
   getRecent: ->
     Rx.Observable.create (subscriber) =>

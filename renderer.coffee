@@ -119,6 +119,15 @@ class PaneViewModel
 
     @opendList = wx.list()
 
+    # FIXME: pane / view の二重配列に変更する
+
+    w = @opendList.listChanged.filter () =>
+      @elem.id == 'pane0' 
+    .map () =>
+      @opendList.toArray()
+
+    storage.tabs w
+
     @tabView.changed.subscribe (tabView) =>
       if tabView.onChanged
         tabView.onChanged()
@@ -156,6 +165,7 @@ class PaneViewModel
           else
             view = new EditorViewModel(uuid)
 
+        uuid = view.uuid
         @addView(view)
         @opendList.push uuid
 
