@@ -70,6 +70,7 @@ application
 * [ ] window resize 情報をセーブ / ロード
 * [ ] テンポラリ保存
 * [ ] 閉じた ViewModel の始末
+* [ ] Mac で文字入力がうまくいかない事例の対策
 
 * アプリケーション名変更
 * css

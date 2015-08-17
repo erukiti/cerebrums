@@ -375,10 +375,17 @@ wx.app.component 'access',
 <table>
   <tbody data-bind="foreach: list">
     <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}, css: klass">
-      <td class="access_title"><span data-bind="text: title"></span></td>
+      <td class="access_title">
+        <i class="fa fa-edit clickable" data-bind="command: {command: $parent.edit, parameter: $data}"></i>
+        <span data-bind="text: title"></span>
+      </td>
     </tr>
     <tr style="text-align: right" data-bind="css: klass">
-      <td class="access_info"><i class="fa fa-edit clickable" data-bind="command: {command: $parent.edit, parameter: $data}"></i> <span data-bind="text: updatedAt"></span></td>
+      <td class="access_info">
+        <span data-bind="text: tags"></span>
+        <span data-bind="visible: star == 1">★</span>
+        <span data-bind="text: updatedAt"></span>
+      </td>
     </tr>
   </tbody>
 </table>

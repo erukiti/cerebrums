@@ -13,7 +13,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   word-break: break-all;
-
+  -webkit-user-select: text;
 }
 
 .tagEditor {
@@ -48,7 +48,6 @@
   word-break: break-all;
   overflow-wrap: break-all;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 textarea {
@@ -62,6 +61,10 @@ textarea {
   padding: 2px;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+input, textarea {
+  -webkit-user-select: text;
 }
 
 input, textarea, keygen, select, button {
@@ -104,6 +107,8 @@ html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  -webkit-user-select: none;
+
 }
 
 #statusbar {
@@ -111,6 +116,7 @@ html {
   background-color: #ffff00;
   width: 100%;
   clear: both;
+  -webkit-user-select: none;
 }
 
 .tab {
@@ -118,6 +124,7 @@ html {
   margin-right: 8px;
   margin-left: 8px;
   word-wrap: normal;
+  -webkit-user-select: none;
 }
 
 .tabSelected {
@@ -129,6 +136,7 @@ html {
   margin-right: 8px;
   margin-left: 8px;
   word-wrap: normal;
+  -webkit-user-select: none;
 }
 
 .separater {
@@ -136,23 +144,29 @@ html {
   height: 100%;
   background-color: red;
   float: left;
+  -webkit-user-select: none;
+
 }
 
 .tabText {
   display: inline;
+  -webkit-user-select: none;
 }
 
 .accessList {
+  -webkit-user-select: none;
 
 }
 
 .clickable {
   cursor: pointer;
+  -webkit-user-select: none;
 }
 
 .selectedAccessList {
   background-color: #282a36;
   color: #ffffff;
+  -webkit-user-select: none;
 }
 
 #panes {
@@ -168,10 +182,12 @@ html {
 
 .access_title {
   font-size: 1.5em;
+  -webkit-user-select: none;
 }
 
 .access_info {
   font-size: 0.75em;
+  -webkit-user-select: none;
 }
 
 .search {
