@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "coffee-script": "^1.9.3",
+    "electron-debug": "^0.1.1",
     "electron-prebuilt": "^0.28.3",
     "gulp": "^3.9.0",
     "gulp-coffee": "^2.3.1",

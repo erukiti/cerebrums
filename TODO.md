@@ -64,9 +64,10 @@ application
 * access view を強化する
 	- [ ] カーソルを上下に移動できるようにする
 	- [ ] コンテキストメニュー
+		https://github.com/atom/electron/blob/master/docs/api/menu.md
 	- [ ] リスト表示のテーブルを横に強制的に最大化する
 * [ ] エラーをステータスバーに表示する
-* [ ] オープンしてるファイルの情報を表示する
+* [ ] ステータスバーにオープンしてるファイルの情報を表示する
 * [ ] window resize 情報をセーブ / ロード
 * [ ] テンポラリ保存
 * [ ] 閉じた ViewModel の始末

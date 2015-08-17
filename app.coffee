@@ -1,6 +1,7 @@
 app = require 'app'
 BrowserWindow = require 'browser-window'
-require('crash-reporter').start();
+require('crash-reporter').start()
+require('electron-debug')()
 # globalShortcut = require('global-shortcut')
 Menu = require 'menu'
 ipc = require 'ipc'
@@ -16,7 +17,7 @@ browserCommand = (message) =>
 app.on 'ready', ->
   win = new BrowserWindow {width: 800, height: 600}
   win.loadUrl "file://#{__dirname}/index.html"
-
+  # win.setTitle 'cerebrums'
   win.on 'closed', ->
     mainWindow = null;
 
@@ -45,25 +46,25 @@ app.on 'ready', ->
       submenu: [
         {
           label: 'New'
-          accelerator: 'Command+T'
+          accelerator: 'CmdOrCtrl+T'
           click: ->
             browserCommand {type: 'tab'}
         },
         {
           label: 'Open'
-          accelerator: 'Command+O'
+          accelerator: 'CmdOrCtrl+O'
           click: ->
             browserCommand {type: 'access'}
         },
         {
           label: 'Save'
-          accelerator: 'Command+S'
+          accelerator: 'CmdOrCtrl+S'
           click: ->
             browserCommand {type: 'save'}
         },
         {
           label: 'Close'
-          accelerator: 'Command+W'
+          accelerator: 'CmdOrCtrl+W'
           click: ->
             browserCommand {type: 'close'}
         }
@@ -74,12 +75,12 @@ app.on 'ready', ->
       submenu: [
         {
           label: 'Undo',
-          accelerator: 'Command+Z',
+          accelerator: 'CmdOrCtrl+Z',
           selector: 'undo:'
         },
         {
           label: 'Redo',
-          accelerator: 'Shift+Command+Z',
+          accelerator: 'Shift+CmdOrCtrl+Z',
           selector: 'redo:'
         },
         {
@@ -87,22 +88,22 @@ app.on 'ready', ->
         },
         {
           label: 'Cut',
-          accelerator: 'Command+X',
+          accelerator: 'CmdOrCtrl+X',
           selector: 'cut:'
         },
         {
           label: 'Copy',
-          accelerator: 'Command+C',
+          accelerator: 'CmdOrCtrl+C',
           selector: 'copy:'
         },
         {
           label: 'Paste',
-          accelerator: 'Command+V',
+          accelerator: 'CmdOrCtrl+V',
           selector: 'paste:'
         },
         {
           label: 'Select All',
-          accelerator: 'Command+A',
+          accelerator: 'CmdOrCtrl+A',
           selector: 'selectAll:'
         },
       ]

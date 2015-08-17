@@ -21,6 +21,9 @@ class EditorViewModel
     @meta = {title: '', tags: '', star: '0'}
     @content = ''
 
+    @isDirty.changed.subscribe (isDirty) =>
+      BrowserWindow.getFocusedWindow().setDocumentEdited(isDirty)
+
     @clickStar = wx.command () =>
       if (@star() == '☆')
         @star('★')
