@@ -24,13 +24,17 @@ class Storage
 
   _write: (rawDriver, uuid, writeObservable, subscriber, prevHash) =>
     return unless writeObservable
-    w = writeObservable.filter((packet) => packet.type == 'change' || packet.type == 'save')
+
+    writeObservable = writeObservable.publish()
+
+    w = writeObservable.filter((packet) => packet.type == 'change')
     w.buffer(w.throttle(1000))
       .map (list) => list[list.length - 1]
       .subscribe (packet) =>
         packed = msgpack.encode({meta: packet.meta, content: packet.content})
         rawDriver.writeTemp(uuid, packed).subscribe (x) =>
-          console.dir("temp saved #{uuid}")
+          # console.log("temp saved #{uuid}")
+          ;
         , (err) => console.error err
 
     writeObservable.filter((packet) => packet.type == 'save').subscribe((packet) =>
@@ -61,8 +65,11 @@ class Storage
     , (err) => console.error err
     )
 
-  create: (uuid, writeObservable) ->
+    writeObservable.connect()
+
+  create: (writeObservable) ->
     Rx.Observable.create (subscriber) =>
+      uuid = uuidv4()
       console.log "create: #{uuid}"
       subscriber.onNext {type: 'uuid', uuid: uuid}
       @_write(@rawDriver, uuid, writeObservable, subscriber)
@@ -93,6 +100,11 @@ class Storage
       @rawDriver.writeTemp('tabs', packed).subscribe (x) =>
         ;
       , (err) => console.error err
+
+  readTabs: ->
+    console.dir @rawDriver
+    @rawDriver.readTemp('tabs').map (packed) =>
+      msgpack.decode(packed)
 
   getRecent: ->
     Rx.Observable.create (subscriber) =>

@@ -20,7 +20,7 @@ class RawDriver
     @rxfs.writeFile(path, file)
 
   readTemp: (filename) =>
-    path = "#{conf.basePath}/temp/#{filename}"
+    path = "#{@conf.basePath}/temp/#{filename}"
     @rxfs.readFile(path)
 
   readBlob: (hash) =>

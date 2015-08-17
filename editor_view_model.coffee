@@ -56,7 +56,6 @@ class EditorViewModel
           @meta['star'] = '1'
         else
           @meta['star'] = '0'
-        console.dir @meta
         @isDirty(true)
 
         obs.onNext
@@ -88,14 +87,13 @@ class EditorViewModel
       storage.open(uuid, _save)
     else
       @uuid = uuidv4()
-      storage.create(@uuid, _save)
+      storage.create(_save)
 
     storageObs.subscribe (packet) =>
       switch packet.type
         when 'meta'
           @meta = packet
           delete @meta['type']
-          console.dir @meta
           @title(packet.title)
           if @meta['star'] == '1'
             @star('★')
@@ -109,7 +107,6 @@ class EditorViewModel
         when 'saved'
           wx.messageBus.sendMessage "saved", 'status-bar'
         when 'uuid'
-          console.log packet.uuid
           @uuid = packet.uuid
         else
           console.dir packet
@@ -159,17 +156,13 @@ class EditorViewModel
 
     win = BrowserWindow.getFocusedWindow()
     result = dialog.showMessageBox win, opt
-    console.log result
     switch result
       when 0
-        console.log '0'
         wx.messageBus.sendMessage @uuid, 'save'
         true
       when 1
-        console.log '1'
         false
       when 2
-        console.log '2'
         true
 
 module.exports = EditorViewModel
