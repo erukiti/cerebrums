@@ -281,6 +281,7 @@ class MainViewModel
     @panes = wx.list()
     @separaters = wx.list()
     @status = wx.property 'statusbar'
+    @title = wx.property 'Cerebrums'
 
     @panesElem = document.getElementById 'panes'
     @statusBarElem = document.getElementById 'statusbar'
@@ -352,7 +353,7 @@ wx.app.component 'pane',
   template: '
 <div class="tabs" data-bind="foreach: tabs">
   <div data-bind="command: {command: $parent.tabChange, parameter: $data.view}, css: klass">
-    <span data-bind="text: tabTitle"></span> <i class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"></i>
+    <span data-bind="text: tabTitle"></span> <span class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"><span>
   </div>
 </div>
 <div class="views" data-bind="foreach: views">
@@ -376,7 +377,7 @@ wx.app.component 'access',
   <tbody data-bind="foreach: list">
     <tr data-bind="event: {click: {command: $parent.open, parameter: $data}, dblclick: {command: $parent.edit, parameter: $data}}, css: klass">
       <td class="access_title">
-        <i class="fa fa-edit clickable" data-bind="command: {command: $parent.edit, parameter: $data}"></i>
+        <span class="fa fa-edit clickable" data-bind="command: {command: $parent.edit, parameter: $data}"></span>
         <span data-bind="text: title"></span>
       </td>
     </tr>
