@@ -86,32 +86,44 @@ class EditorViewModel
         else
           wx.messageBus.sendMessage 'no saved', 'status-bar'
 
+      wx.messageBus.listen('close').subscribe (uuid) =>
+        return if uuid != @uuid
+        obs.onNext
+          type: 'close'
+        obs.onComplete()
+
     storageObs = if uuid
       storage.open(uuid, _save)
     else
       @uuid = uuidv4()
-      storage.create(_save)
+      storage.create(@uuid, _save)
 
     storageObs.subscribe (packet) =>
       switch packet.type
         when 'meta'
-          @meta = packet
-          delete @meta['type']
-          @title(packet.title)
+          @meta = packet.meta
+          @title(@meta.title)
           if @meta['star'] == '1'
             @star('★')
           else
             @star('☆')
           @tags(@meta['tags'])
+          @isDirty(false)
 
         when 'content'
-          @content = packet.content.toString()
+          content = new Buffer(packet.content)
+          @content = content.toString()
           @text(@content)
+          @isDirty(false)
+
         when 'saved'
           wx.messageBus.sendMessage "saved", 'status-bar'
+
         when 'uuid'
           @uuid = packet.uuid
+
         else
+          console.error 'unknown packet'
           console.dir packet
 
   setHeight: (height) ->
@@ -162,10 +174,12 @@ class EditorViewModel
     switch result
       when 0
         wx.messageBus.sendMessage @uuid, 'save'
+        wx.messageBus.sendMessage @uuid, 'close'
         true
       when 1
         false
       when 2
+        wx.messageBus.sendMessage @uuid, 'close'
         true
 
 module.exports = EditorViewModel

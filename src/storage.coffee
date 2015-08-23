@@ -25,8 +25,6 @@ class Storage
   _write: (rawDriver, uuid, writeObservable, subscriber, prevHash) =>
     return unless writeObservable
 
-    writeObservable = writeObservable.publish()
-
     w = writeObservable.filter((packet) => packet.type == 'change')
     w.buffer(w.throttle(1000))
       .map (list) => list[list.length - 1]
@@ -65,25 +63,34 @@ class Storage
     , (err) => console.error err
     )
 
-    writeObservable.connect()
+    writeObservable
+      .subscribe (packet) =>
+        if packet.type == 'close'
+          subscriber.onCompleted()
+      , (err) => console.error (err)
+      , => subscriber.onCompleted()
 
-  create: (writeObservable) ->
+  create: (uuid, writeObservable) ->
     Rx.Observable.create (subscriber) =>
-      uuid = uuidv4()
       console.log "create: #{uuid}"
+      writeObservable = writeObservable.publish()
+      writeObservable.connect()
+
       subscriber.onNext {type: 'uuid', uuid: uuid}
       @_write(@rawDriver, uuid, writeObservable, subscriber)
 
   open: (uuid, writeObservable) ->
     Rx.Observable.create (subscriber) =>
       console.log "open: #{uuid}"
+      writeObservable = writeObservable.publish()
+      writeObservable.connect()
+
       @rawDriver.readPointer(uuid).subscribe (metaHash) =>
         @rawDriver.readBlob(metaHash).subscribe (metaMsgpack) =>
           meta = msgpack.decode(metaMsgpack)
           contentHash = meta.sha256
           delete meta.sha256
-          meta.type = 'meta'
-          subscriber.onNext(meta)
+          subscriber.onNext {type: 'meta', meta: meta}
 
           @rawDriver.readBlob(contentHash).subscribe (content) =>
             subscriber.onNext({type: 'content', content: content})
@@ -102,7 +109,6 @@ class Storage
       , (err) => console.error err
 
   readTabs: ->
-    console.dir @rawDriver
     @rawDriver.readTemp('tabs').map (packed) =>
       msgpack.decode(packed)
 

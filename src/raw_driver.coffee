@@ -7,6 +7,7 @@ class RawDriver
 
   writeTemp: (filename, file) =>
     path = "#{@conf.basePath}/temp/#{filename}"
+    # console.dir "writeTemp: #{path}"
     @rxfs.writeFile(path, file)
 
   writeBlob: (hash, file) =>

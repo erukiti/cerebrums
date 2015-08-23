@@ -43,7 +43,8 @@ class AccessViewModel
       storage.open(meta.uuid).subscribe (packet) =>
         switch packet.type
           when 'content'
-            @previewHtml(marked(packet.content.toString()))
+            content = new Buffer(packet.content)
+            @previewHtml(marked(content.toString()))
 
       for _meta in @list.toArray()
         if _meta == meta
@@ -120,13 +121,10 @@ class PaneViewModel
     @opendList = wx.list()
 
     # FIXME: pane / view の二重配列に変更する
-
-    w = @opendList.listChanged.filter () =>
+    @opendList.listChanged.filter () =>
       @elem.id == 'pane0' 
     .map () =>
-      @opendList.toArray()
-
-    storage.tabs w
+      storage.tabs @opendList.toArray()
 
     @tabView.changed.subscribe (tabView) =>
       if tabView.onChanged
