@@ -383,6 +383,7 @@ wx.app.component 'access',
       <td class="access_info">
         <span data-bind="text: tags"></span>
         <span data-bind="visible: star == 1">★</span>
+        <span data-bind="text: size"></span><span>bytes</span>
         <span data-bind="text: updatedAt"></span>
       </td>
     </tr>

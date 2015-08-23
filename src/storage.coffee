@@ -36,11 +36,12 @@ class Storage
         , (err) => console.error err
 
     writeObservable.filter((packet) => packet.type == 'save').subscribe((packet) =>
-      content = packet.content
+      content = new Buffer(packet.content)
       contentHash = sha256(content)
       rawDriver.writeBlob(contentHash, content).subscribe((x) =>
         meta = packet.meta
         meta.sha256 = contentHash
+        meta.size = content.length
         meta.createdAt = (new Date()).toISOString() unless prevHash
         meta.updatedAt = (new Date()).toISOString()
         meta.prevSha256 = prevHash if prevHash

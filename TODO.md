@@ -67,7 +67,7 @@ application
 		https://github.com/atom/electron/blob/master/docs/api/menu.md
 	- [ ] リスト表示のテーブルを横に強制的に最大化する
 	- [ ] タグに下線を張ってリンク機能を追加する
-	- [ ] ファイルサイズ情報を追加
+	- [x] ファイルサイズ情報を追加
 * 設定ビュー
 	- [ ] ディレクトリ設定
 * [ ] エラーをステータスバーに表示する
