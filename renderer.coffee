@@ -257,9 +257,9 @@ class PaneViewModel
       height = @height
     @elem.style.height = "#{height}px"
     height -= @elemTabs.offsetHeight
-    console.dir @views.toArray()
+    # console.dir @views.toArray()
     @views.forEach (view) ->
-      console.dir view
+      # console.dir view
       view.setHeight height
 
   setElement: (elem) ->

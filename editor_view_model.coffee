@@ -156,8 +156,6 @@ class EditorViewModel
     @elemTitleEditor = @elem.children[2]
     @elemEditor = @elem.children[3]
 
-    console.dir @elemTitleEditor
-
   setId: (id) ->
     @id = id
 

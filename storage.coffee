@@ -1,5 +1,6 @@
 ipc = require 'ipc'
 uuidv4 = require 'uuid-v4'
+_ = require 'underscore'
 
 class StorageWrapper
   constructor: ->
@@ -21,7 +22,7 @@ class StorageWrapper
     if writeStream
       writeStream.subscribe (packet) =>
         if packet.type == 'change' || packet.type == 'save'
-          console.warn "temp save #{uuid}"
+          # console.warn "temp save #{uuid}"
           localStorage.setItem uuid, JSON.stringify(packet)
 
         ipc.send "storage-#{uuid}", packet
@@ -32,18 +33,18 @@ class StorageWrapper
         switch packet.type
           when 'meta'
             if @intercept[uuid]
-              console.log "temp load meta: #{uuid}"
+              # console.log "temp load meta: #{uuid}"
               packet = {type: 'meta', meta: @intercept[uuid].meta}
             Rx.Observable.just packet
           when 'content'
             if @intercept[uuid]
-              console.log "temp load content: #{uuid}"
+              # console.log "temp load content: #{uuid}"
               packet = {type: 'content', content: @intercept[uuid].content}
               delete @intercept[uuid]
             Rx.Observable.just packet
           when 'notfound'
             if @intercept[uuid]
-              console.log "temp load (notfound): #{uuid}"
+              # console.log "temp load (notfound): #{uuid}"
               Rx.Observable.from [{type: 'meta', meta: @intercept[uuid].meta}, {type: 'content', content: @intercept[uuid].content}]
             else
               Rx.Observable.just packet
@@ -59,7 +60,7 @@ class StorageWrapper
     if writeStream
       writeStream.subscribe (packet) =>
         if packet.type == 'change' || packet.type == 'save'
-          console.warn "temp save #{uuid}"
+          # console.warn "temp save #{uuid}"
           localStorage.setItem uuid, JSON.stringify(packet)
 
         ipc.send "storage-#{uuid}", packet
@@ -91,11 +92,16 @@ class StorageWrapper
       .map (packet) => packet.meta
 
   tabs: (tabArray) ->
-    console.dir tabArray
     localStorage.setItem 'tabs', JSON.stringify(tabArray)
 
+    for i in [0...localStorage.length]
+      uuid = localStorage.key(i)
+      if uuid != 'tabs' && !_.contains(tabArray, uuid)
+        localStorage.removeItem(uuid)
+
+
   restore: ->
-    tabs = JSON.parse(localStorage.getItem('tabs'))
+    tabs = JSON.parse(localStorage.getItem('tabs')) || []
     @intercept = []
     for uuid in tabs
       @intercept[uuid] = JSON.parse(localStorage.getItem(uuid))
