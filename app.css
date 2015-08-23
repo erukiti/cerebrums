@@ -11,7 +11,6 @@
   line-height: 1.5;
   resize: none;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   word-break: break-all;
   -webkit-user-select: text;
 }
@@ -105,7 +104,6 @@ html {
 }
 html {
   font-family: sans-serif;
-  -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   -webkit-user-select: none;
 

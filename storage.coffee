@@ -99,12 +99,13 @@ class StorageWrapper
       if uuid != 'tabs' && !_.contains(tabArray, uuid)
         localStorage.removeItem(uuid)
 
-
   restore: ->
     tabs = JSON.parse(localStorage.getItem('tabs')) || []
     @intercept = []
     for uuid in tabs
       @intercept[uuid] = JSON.parse(localStorage.getItem(uuid))
+    console.log @intercept.length == 0
+    tabs = [null] if @intercept.length == 0
     tabs
 
 

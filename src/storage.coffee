@@ -46,6 +46,7 @@ class Storage
         meta.updatedAt = (new Date()).toISOString()
         meta.prevSha256 = prevHash if prevHash
         meta.uuid = uuid
+        meta.version = 1
         metaMsgpack = msgpack.encode(meta)
         metaHash = sha256(metaMsgpack)
 

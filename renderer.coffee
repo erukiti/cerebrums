@@ -402,15 +402,10 @@ wx.applyBindings(mainViewModel)
 mainViewModel.addPane()
 mainViewModel.addPane()
 
-tabs = storage.restore() || [null]
-for uuid in tabs
+for uuid in storage.restore()
   mainViewModel.panes.get(0).new(uuid)
 
 mainViewModel.panes.get(1).new('preview-view')
-
-# storage.readTabs().subscribe (list) =>
-#   for uuid in list
-#     mainViewModel.panes.get(0).new(uuid)
 
 # mainViewModel.panes.get(0).previewObservable.subscribe (html) ->
 mainViewModel.panes.get(0).tabView.changed.merge(Rx.Observable.just(mainViewModel.panes.get(0).tabView())).subscribe (view) =>
