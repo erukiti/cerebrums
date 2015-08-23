@@ -75,8 +75,9 @@ application
 * [ ] window resize 情報をセーブ / ロード
 * [x] テンポラリ保存
 * ダーティフラグの修正
-	- [ ] ダーティフラグをわかりやすくする
-	- [ ] テンポラリからの復帰時に必要なら dirty flag をつける
+	- [x] ダーティフラグをわかりやすくする
+	- [ ] storage からのパケットで、original と changedを分ける
+	- [ ] dirty flag の判定を wx.when に書き直す
 * [ ] 閉じた ViewModel の始末
 * [ ] Mac で文字入力がうまくいかない事例の対策
 * [ ] meta に format version を入れる

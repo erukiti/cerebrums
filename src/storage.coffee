@@ -25,9 +25,15 @@ class Storage
   _write: (rawDriver, uuid, writeObservable, subscriber, prevHash) =>
     return unless writeObservable
 
-    w = writeObservable.filter((packet) => packet.type == 'change')
+    w = writeObservable
+      .filter((packet) => packet.type == 'change')
+      .distinctUntilChanged()
     w.buffer(w.throttle(1000))
-      .map (list) => list[list.length - 1]
+      .filter (list) =>
+        # work a round. でもこれがなぜ発生するかわからない
+        list.length > 0
+      .map (list) => 
+        list[list.length - 1]
       .subscribe (packet) =>
         packed = msgpack.encode({meta: packet.meta, content: packet.content})
         rawDriver.writeTemp(uuid, packed).subscribe (x) =>

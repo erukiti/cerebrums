@@ -30,22 +30,23 @@ class StorageWrapper
     @observer
       .filter (packet) => packet.uuid == uuid
       .flatMap (packet) =>
+        packet.isDirty = false
         switch packet.type
           when 'meta'
             if @intercept[uuid]
               # console.log "temp load meta: #{uuid}"
-              packet = {type: 'meta', meta: @intercept[uuid].meta}
+              packet = {type: 'meta', isDirty: true, meta: @intercept[uuid].meta}
             Rx.Observable.just packet
           when 'content'
             if @intercept[uuid]
               # console.log "temp load content: #{uuid}"
-              packet = {type: 'content', content: @intercept[uuid].content}
+              packet = {type: 'content', isDirty: true, content: @intercept[uuid].content}
               delete @intercept[uuid]
             Rx.Observable.just packet
           when 'notfound'
             if @intercept[uuid]
               # console.log "temp load (notfound): #{uuid}"
-              Rx.Observable.from [{type: 'meta', meta: @intercept[uuid].meta}, {type: 'content', content: @intercept[uuid].content}]
+              Rx.Observable.from [{type: 'meta', isDirty: true, meta: @intercept[uuid].meta}, {type: 'content', isDirty: true, content: @intercept[uuid].content}]
             else
               Rx.Observable.just packet
           else
@@ -102,10 +103,14 @@ class StorageWrapper
   restore: ->
     tabs = JSON.parse(localStorage.getItem('tabs')) || []
     @intercept = []
+    f = false
     for uuid in tabs
       @intercept[uuid] = JSON.parse(localStorage.getItem(uuid))
-    tabs = [null] if @intercept.length == 0
-    tabs
+      f = true
+    if f
+      tabs
+    else
+      [null]
 
 
 storage = new StorageWrapper()

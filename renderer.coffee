@@ -234,7 +234,7 @@ class PaneViewModel
         title
     .map (title) ->
       if title.length > 10
-        "#{title.substr(0, 8)}..."
+        "#{title.substr(0, 8)}…"
       else
         title
     .subscribe (title) ->

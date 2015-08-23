@@ -88,9 +88,9 @@ class EditorViewModel
 
       wx.messageBus.listen('close').subscribe (uuid) =>
         return if uuid != @uuid
-        obs.onNext
-          type: 'close'
-        obs.onComplete()
+        # obs.onNext
+        #   type: 'close'
+        obs.onCompleted()
 
     storageObs = if uuid
       storage.open(uuid, _save)
@@ -99,6 +99,7 @@ class EditorViewModel
       storage.create(@uuid, _save)
 
     storageObs.subscribe (packet) =>
+      console.dir packet
       switch packet.type
         when 'meta'
           @meta = packet.meta
@@ -108,13 +109,20 @@ class EditorViewModel
           else
             @star('☆')
           @tags(@meta['tags'])
-          @isDirty(false)
+          if packet.isDirty
+            @isDirty(true)
+          else
+            @isDirty(false)            
 
         when 'content'
           content = new Buffer(packet.content)
           @content = content.toString()
           @text(@content)
-          @isDirty(false)
+          if packet.isDirty
+            @isDirty(true)
+          else
+            @isDirty(false)            
+
 
         when 'saved'
           wx.messageBus.sendMessage "saved", 'status-bar'

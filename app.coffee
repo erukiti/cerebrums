@@ -38,7 +38,7 @@ createWriteObserver = (uuid) =>
         when 'save'
           obs.onNext packet
         when 'close'
-          obs.onComplete()
+          obs.onCompleted()
 
 ipc.on 'storage', (event, packet) =>
   switch packet.type
