@@ -104,7 +104,6 @@ class StorageWrapper
     @intercept = []
     for uuid in tabs
       @intercept[uuid] = JSON.parse(localStorage.getItem(uuid))
-    console.log @intercept.length == 0
     tabs = [null] if @intercept.length == 0
     tabs
 

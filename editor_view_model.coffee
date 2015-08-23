@@ -160,11 +160,14 @@ class EditorViewModel
     @id = id
 
   previewObservable: ->
-    @text.changed.merge(Rx.Observable.just(@text())).map (text) ->
+    @text.changed.merge(Rx.Observable.just(@text())).map (text) =>
       marked(text)
 
   titleObservable: ->
     @title.changed.merge(Rx.Observable.just(''))
+
+  isDirtyObservable: ->
+    @isDirty.changed.merge(Rx.Observable.just(false))
 
   closeOk: ->
     return true unless @isDirty()

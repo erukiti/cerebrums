@@ -29,6 +29,9 @@ class PreviewViewModel
   titleObservable: ->
     Rx.Observable.just('preview')
 
+  isDirtyObservable: ->
+    Rx.Observable.just(false)
+
   closeOk: ->
     false
 
@@ -99,6 +102,9 @@ class AccessViewModel
 
   titleObservable: ->
     Rx.Observable.just('access')
+
+  isDirtyObservable: ->
+    Rx.Observable.just(false)
 
   closeOk: ->
     true
@@ -207,7 +213,12 @@ class PaneViewModel
 
   addView: (view) ->
     n = @tabs.length()
-    tab = {tabTitle: wx.property(''), view: view, klass: wx.property 'tab'}
+    tab = {
+      tabTitle: wx.property(''), 
+      isDirty: wx.property(''),
+      view: view,
+      klass: wx.property 'tab'
+    }
 
     @tabs.push tab
     @views.push view
@@ -228,6 +239,12 @@ class PaneViewModel
         title
     .subscribe (title) ->
       tab.tabTitle(title)
+
+    view.isDirtyObservable().subscribe (isDirty) =>
+      if isDirty
+        tab.isDirty '*'
+      else
+        tab.isDirty ''
 
     @tabChange.execute(view) if @tabView() == null
 
@@ -355,7 +372,8 @@ wx.app.component 'pane',
   template: '
 <div class="tabs" data-bind="foreach: tabs">
   <div data-bind="command: {command: $parent.tabChange, parameter: $data.view}, css: klass">
-    <span data-bind="text: tabTitle"></span> <span class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"><span>
+    <span data-bind="text: isDirty"></span><span data-bind="text: tabTitle"></span>
+    <span class="fa fa-close" data-bind="command: {command: $parent.closeView, parameter: $data.view}"><span>
   </div>
 </div>
 <div class="views" data-bind="foreach: views">
