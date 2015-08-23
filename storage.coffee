@@ -10,6 +10,8 @@ class StorageWrapper
 
     @observer.connect()
 
+    @intercept = []
+
   open: (uuid, writeStream) ->
     ipc.send 'storage', {
       type: 'open',
@@ -18,10 +20,35 @@ class StorageWrapper
 
     if writeStream
       writeStream.subscribe (packet) =>
+        if packet.type == 'change' || packet.type == 'save'
+          console.warn "temp save #{uuid}"
+          localStorage.setItem uuid, JSON.stringify(packet)
+
         ipc.send "storage-#{uuid}", packet
 
     @observer
       .filter (packet) => packet.uuid == uuid
+      .flatMap (packet) =>
+        switch packet.type
+          when 'meta'
+            if @intercept[uuid]
+              console.log "temp load meta: #{uuid}"
+              packet = {type: 'meta', meta: @intercept[uuid].meta}
+            Rx.Observable.just packet
+          when 'content'
+            if @intercept[uuid]
+              console.log "temp load content: #{uuid}"
+              packet = {type: 'content', content: @intercept[uuid].content}
+              delete @intercept[uuid]
+            Rx.Observable.just packet
+          when 'notfound'
+            if @intercept[uuid]
+              console.log "temp load (notfound): #{uuid}"
+              Rx.Observable.from [{type: 'meta', meta: @intercept[uuid].meta}, {type: 'content', content: @intercept[uuid].content}]
+            else
+              Rx.Observable.just packet
+          else
+            Rx.Observable.just packet
 
   create: (uuid, writeStream) ->
     ipc.send 'storage', {
@@ -31,6 +58,10 @@ class StorageWrapper
 
     if writeStream
       writeStream.subscribe (packet) =>
+        if packet.type == 'change' || packet.type == 'save'
+          console.warn "temp save #{uuid}"
+          localStorage.setItem uuid, JSON.stringify(packet)
+
         ipc.send "storage-#{uuid}", packet
 
     @observer
@@ -60,14 +91,17 @@ class StorageWrapper
       .map (packet) => packet.meta
 
   tabs: (tabArray) ->
-    ipc.send 'storage', {
-      type: 'tabs',
-      tabs: tabArray
-    }
-# - temp 読み取り
+    console.dir tabArray
+    localStorage.setItem 'tabs', JSON.stringify(tabArray)
+
+  restore: ->
+    tabs = JSON.parse(localStorage.getItem('tabs'))
+    @intercept = []
+    for uuid in tabs
+      @intercept[uuid] = JSON.parse(localStorage.getItem(uuid))
+    tabs
 
 
 storage = new StorageWrapper()
-console.error 'new'
 
 module.exports = storage

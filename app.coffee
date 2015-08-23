@@ -13,6 +13,9 @@ Rxfs = require './src/rxfs.coffee'
 
 windows = []
 
+# console.log process.memoryUsage()
+# console.log process.uptime()
+
 app.on 'window-all-closed', ->
   app.quit()
 
@@ -55,17 +58,15 @@ ipc.on 'storage', (event, packet) =>
           uuid: packet.uuid,
           meta: meta
 
-
     when 'getRecent'
       storage.getRecent().subscribe (meta) =>
         event.sender.send 'storage',
           uuid: packet.uuid,
           meta: meta
 
-    when 'tabs'
-      ;
-
-  # event.sender.send('asynchronous-reply', 'pong');
+    else
+      console.error 'unknown packet'
+      console.dir packet
 
 
 app.on 'ready', ->

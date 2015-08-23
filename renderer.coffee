@@ -116,19 +116,21 @@ class PaneViewModel
           _tab.klass 'tab'
 
       @tabView(tabView)
+      tabView.setHeight()
     , this
 
-    @opendList = wx.list()
+    @openedList = wx.list()
 
     # FIXME: pane / view の二重配列に変更する
-    @opendList.listChanged.filter () =>
-      @elem.id == 'pane0' 
-    .map () =>
-      storage.tabs @opendList.toArray()
+    @openedList.listChanged
+    .filter () =>
+      @elem.id == 'pane0'
+    .subscribe () =>
+      storage.tabs @openedList.toArray()
 
-    @tabView.changed.subscribe (tabView) =>
-      if tabView.onChanged
-        tabView.onChanged()
+    # @tabView.changed.subscribe (tabView) =>
+    #   if tabView.onChanged
+    #     tabView.onChanged()
 
     @closeView = wx.command (tabView) =>
       tabView = @tabView() unless tabView
@@ -144,7 +146,7 @@ class PaneViewModel
         if tab.view == tabView
           @tabs.remove(tab)
           @views.remove(tabView)
-          @opendList.remove(tabView.uuid)
+          @openedList.remove(tabView.uuid)
           break
         i++
 
@@ -152,7 +154,7 @@ class PaneViewModel
       @tabChange.execute(@tabs.get(i).view) if @tabs.length > 0
 
   new: (uuid) =>
-    if uuid && @opendList.contains(uuid)
+    if uuid && @openedList.contains(uuid)
         view = @searchView(uuid)
       else
         switch uuid
@@ -165,7 +167,7 @@ class PaneViewModel
 
         uuid = view.uuid
         @addView(view)
-        @opendList.push uuid
+        @openedList.push uuid
 
       @tabChange.execute(view)
       @setHeight()
@@ -255,7 +257,9 @@ class PaneViewModel
       height = @height
     @elem.style.height = "#{height}px"
     height -= @elemTabs.offsetHeight
+    console.dir @views.toArray()
     @views.forEach (view) ->
+      console.dir view
       view.setHeight height
 
   setElement: (elem) ->
@@ -398,7 +402,10 @@ wx.applyBindings(mainViewModel)
 mainViewModel.addPane()
 mainViewModel.addPane()
 
-mainViewModel.panes.get(0).new()
+tabs = storage.restore() || [null]
+for uuid in tabs
+  mainViewModel.panes.get(0).new(uuid)
+
 mainViewModel.panes.get(1).new('preview-view')
 
 # storage.readTabs().subscribe (list) =>

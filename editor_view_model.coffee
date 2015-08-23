@@ -127,13 +127,19 @@ class EditorViewModel
           console.dir packet
 
   setHeight: (height) ->
+    if height
+      @height = height
+    else
+      height = @height
+
     unless @elemTitleEditor.offsetHeight
       # Fixme: work a round.
-      console.warn "EditorViewModel#setHeight: @elemTitleEditor.offsetHeight is unknown"
+      console.warn "EditorViewModel#setHeight: #{@uuid}, @elemTitleEditor.offsetHeight is unknown"
+
       return
-    @height = height
+
     @elem.style.height = "#{height}px"
-    # console.log "EditorViewModel#setHeight: #{@elemTitleEditor.offsetHeight}"
+    # console.log "EditorViewModel#setHeight: #{@uuid}, #{@elemTitleEditor.offsetHeight}"
     height -= @elemTitleEditor.offsetHeight + @elemTagsEditor.offsetHeight
 
     @elemEditor.style.height = "#{height}px"
@@ -149,6 +155,8 @@ class EditorViewModel
     @elemTagsEditor = @elem.children[1]
     @elemTitleEditor = @elem.children[2]
     @elemEditor = @elem.children[3]
+
+    console.dir @elemTitleEditor
 
   setId: (id) ->
     @id = id

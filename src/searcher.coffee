@@ -71,9 +71,6 @@ class Searcher
         isTitle = true
         isText = true
 
-      console.dir isTitle
-      console.dir q
-
       continue if q == ''
 
       result = []

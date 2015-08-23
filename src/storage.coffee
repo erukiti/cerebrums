@@ -100,7 +100,12 @@ class Storage
           @_write(@rawDriver, uuid, writeObservable, subscriber, contentHash)
 
         , (err) => subscriber.onError(err)
-      , (err) => subscriber.onError(err)
+      , (err) =>
+        if err.code == 'ENOENT'
+          subscriber.onNext {type: 'notfound'}
+        else
+          subscriber.onError(err)
+
 
   tabs: (obs) ->
     obs.subscribe (list) =>

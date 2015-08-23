@@ -76,6 +76,7 @@ application
 * [ ] テンポラリ保存
 * [ ] 閉じた ViewModel の始末
 * [ ] Mac で文字入力がうまくいかない事例の対策
+* [ ] meta に format version を入れる
 
 * アプリケーション名変更
 * css
