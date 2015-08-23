@@ -128,9 +128,9 @@ class PaneViewModel
     .subscribe () =>
       storage.tabs @openedList.toArray()
 
-    # @tabView.changed.subscribe (tabView) =>
-    #   if tabView.onChanged
-    #     tabView.onChanged()
+    @tabView.changed.subscribe (tabView) =>
+      if tabView.onChanged
+        tabView.onChanged()
 
     @closeView = wx.command (tabView) =>
       tabView = @tabView() unless tabView
