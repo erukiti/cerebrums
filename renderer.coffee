@@ -397,7 +397,8 @@ wx.app.component 'pane',
 
 wx.app.component 'editor',
   template: '
-<span data-bind="text: star, command: clickStar"></span><input type="text" class="tagEditor" data-bind="textinput: @tags" placeholder="タグ">
+<span data-bind="text: star, command: clickStar"></span>
+<input type="text" class="tagEditor" data-bind="textinput: @tags" placeholder="タグ">
 <input type="text" class="titleEditor" data-bind="textinput: @title" placeholder="タイトル">
 <textarea class="editor" data-bind="textinput: @text"></textarea>
 '

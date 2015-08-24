@@ -48,19 +48,28 @@ class StorageWrapper
         switch packet.type
           when 'meta'
             if @intercept[uuid]
-              Rx.Observable.from([packet, {type: 'meta', isDirty: true, meta: @intercept[uuid].meta}])
+              Rx.Observable.from([
+                {type: 'meta', isDirty: false, meta: packet.meta},
+                {type: 'meta', isDirty: true, meta: @intercept[uuid].meta}
+              ])
             else
               Rx.Observable.just packet
           when 'content'
             if @intercept[uuid]
-              Rx.Observable.from([packet, {type: 'content', isDirty: true, content: @intercept[uuid].content}])
+              observable = Rx.Observable.from([
+                {type: 'content', isDirty: false, content: packet.content}
+                {type: 'content', isDirty: true, content: @intercept[uuid].content}
+              ])
               delete @intercept[uuid]
+              observable
             else
               Rx.Observable.just packet
           when 'notfound'
             if @intercept[uuid]
-              # console.log "temp load (notfound): #{uuid}"
-              Rx.Observable.from [{type: 'meta', isDirty: true, meta: @intercept[uuid].meta}, {type: 'content', isDirty: true, content: @intercept[uuid].content}]
+              Rx.Observable.from [
+                {type: 'meta', isDirty: true, meta: @intercept[uuid].meta},
+                {type: 'content', isDirty: true, content: @intercept[uuid].content}
+              ]
             else
               Rx.Observable.just packet
           else

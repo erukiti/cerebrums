@@ -26,7 +26,6 @@ application
 * リファクタリング
 	- [ ] view を独立したコンポーネントにする
     - [ ] pane を動的に構成する
-	- [x] ファイルアクセスをメインプロセスに移動する
 	- [ ] mainViewModel.constructor の引数でpane数を指定してpaneを作成する
 		* [ ] setElemをイベント駆動 (onReady的な)にする
 	- [ ] 順番が前後しても正常に動くようにする
@@ -73,14 +72,9 @@ application
 * [ ] エラーをステータスバーに表示する
 * [ ] ステータスバーにオープンしてるファイルの情報を表示する
 * [ ] window resize 情報をセーブ / ロード
-* [x] テンポラリ保存
-* ダーティフラグの修正
-	- [x] ダーティフラグをわかりやすくする
-	- [ ] storage からのパケットで、original と changedを分ける
-	- [ ] dirty flag の判定を wx.when に書き直す
 * [ ] 閉じた ViewModel の始末
 * [ ] Mac で文字入力がうまくいかない事例の対策
-* [ ] meta に format version を入れる
+* [x] meta に format version を入れる
 
 
 * アプリケーション名変更

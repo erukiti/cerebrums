@@ -31,16 +31,16 @@ class EditorViewModel
     @star = wx.property '☆'
     @tags = wx.property ''
 
-    @originalTitle = ''
-    @originalStar = '☆'
-    @originalTags = ''
-    @originalText = ''
+    @originalTitle = wx.property ''
+    @originalStar = wx.property '☆'
+    @originalTags = wx.property ''
+    @originalText = wx.property ''
 
-    @isDirty = wx.whenAny @title, @text, @star, @tags, (title, text, star, tags) =>
-      title != @originalTitle ||
-      text != @originalText ||
-      star != @originalStar ||
-      tags |= @originalTags
+    @isDirty = wx.whenAny @title, @text, @star, @tags, @originalTitle, @originalText, @originalStar, @originalTags, (title, text, star, tags, originalTitle, originalText, originalStar, originalTags) =>
+      title != originalTitle ||
+      text != originalText ||
+      star != originalStar ||
+      tags != originalTags
     .toProperty()
 
     @meta = {title: '', tags: '', star: '0'}
@@ -101,10 +101,11 @@ class EditorViewModel
             meta: @meta
             content: @text()
 
-          @originalTitle = @title()
-          @originalText = @text()
-          @originalStar = @star()
-          @originalTags = @tags()
+          @originalTitle @title()
+          @originalText @text()
+          @originalStar @star()
+          @originalTags @tags()
+
         else
           wx.messageBus.sendMessage 'no saved', 'status-bar'
 
@@ -133,18 +134,16 @@ class EditorViewModel
           @tags(@meta['tags'])
 
           if !packet.isDirty
-            @originalTitle = @title()
-            @originalStar = @star()
-            @originalTags = @tags()
+            @originalTitle @title()
+            @originalStar @star()
+            @originalTags @tags()
 
         when 'content'
           content = new Buffer(packet.content)
-
-          if !packet.isDirty
-            @originalText = content.toString()
-
           @text(content.toString())
 
+          if !packet.isDirty
+            @originalText @text()
 
         when 'saved'
           wx.messageBus.sendMessage "saved", 'status-bar'
