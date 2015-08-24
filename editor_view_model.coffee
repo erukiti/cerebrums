@@ -20,23 +20,33 @@ BrowserWindow = remote.require 'browser-window'
 dialog = remote.require 'dialog'
 uuidv4 = require 'uuid-v4'
 
-storage = require('./storage.coffee')
+storage = require './storage.coffee'
 
 class EditorViewModel
   constructor: (uuid) ->
     @uuid = uuid
     @title = wx.property ''
     @text = wx.property ''
-    @isDirty = wx.property false
     @html = wx.property '<editor></editor>'
     @star = wx.property '☆'
     @tags = wx.property ''
 
-    @meta = {title: '', tags: '', star: '0'}
-    @content = ''
+    @originalTitle = ''
+    @originalStar = '☆'
+    @originalTags = ''
+    @originalText = ''
 
-    @isDirty.changed.subscribe (isDirty) =>
-      BrowserWindow.getFocusedWindow().setDocumentEdited(isDirty)
+    @isDirty = wx.whenAny @title, @text, @star, @tags, (title, text, star, tags) =>
+      title != @originalTitle ||
+      text != @originalText ||
+      star != @originalStar ||
+      tags |= @originalTags
+    .toProperty()
+
+    @meta = {title: '', tags: '', star: '0'}
+
+    # @isDirty.changed.subscribe (isDirty) =>
+    #   BrowserWindow.getFocusedWindow().setDocumentEdited(isDirty)
 
     @clickStar = wx.command () =>
       if (@star() == '☆')
@@ -52,42 +62,36 @@ class EditorViewModel
     _save = Rx.Observable.create (obs) =>
       @title.changed.subscribe (title) =>
         @meta['title'] = title
-        @isDirty(true)
 
         obs.onNext
           type: 'change'
           meta: @meta
-          content: @content
+          content: @text()
       
       @tags.changed.subscribe (tags) =>
         @meta['tags'] = tags
-        @isDirty(true)
 
         obs.onNext
           type: 'change'
           meta: @meta
-          content: @content
+          content: @text()
 
       @star.changed.subscribe (star) =>
         if star == '★'
           @meta['star'] = '1'
         else
           @meta['star'] = '0'
-        @isDirty(true)
 
         obs.onNext
           type: 'change'
           meta: @meta
-          content: @content
+          content: @text()
 
       @text.changed.subscribe (text) =>
-        @content = text
-        @isDirty(true)
-
         obs.onNext
           type: 'change'
           meta: @meta
-          content: @content
+          content: text
 
       wx.messageBus.listen('save').subscribe (uuid) =>
         return if uuid != @uuid
@@ -95,8 +99,12 @@ class EditorViewModel
           obs.onNext
             type: 'save'
             meta: @meta
-            content: @content
-          @isDirty(false)
+            content: @text()
+
+          @originalTitle = @title()
+          @originalText = @text()
+          @originalStar = @star()
+          @originalTags = @tags()
         else
           wx.messageBus.sendMessage 'no saved', 'status-bar'
 
@@ -123,19 +131,19 @@ class EditorViewModel
           else
             @star('☆')
           @tags(@meta['tags'])
-          if packet.isDirty
-            @isDirty(true)
-          else
-            @isDirty(false)            
+
+          if !packet.isDirty
+            @originalTitle = @title()
+            @originalStar = @star()
+            @originalTags = @tags()
 
         when 'content'
           content = new Buffer(packet.content)
-          @content = content.toString()
-          @text(@content)
-          if packet.isDirty
-            @isDirty(true)
-          else
-            @isDirty(false)            
+
+          if !packet.isDirty
+            @originalText = content.toString()
+
+          @text(content.toString())
 
 
         when 'saved'
