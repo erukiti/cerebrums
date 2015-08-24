@@ -82,6 +82,7 @@ application
 * [ ] Mac で文字入力がうまくいかない事例の対策
 * [ ] meta に format version を入れる
 
+
 * アプリケーション名変更
 * css
 	- [ ] preview 用

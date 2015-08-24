@@ -18,3 +18,8 @@ $ npm install
 $ npm start
 ```
 
+LICENSE
+-------
+
+* Apache Software License version2.0
+    - http://www.apache.org/licenses/LICENSE-2.0
