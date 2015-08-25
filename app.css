@@ -101,12 +101,11 @@ body {
 html {
   font-size: 10px;
   -webkit-tap-highlight-color: transparent;
-}
-html {
   font-family: sans-serif;
   -webkit-text-size-adjust: 100%;
   -webkit-user-select: none;
 
+  overflow: hidden;
 }
 
 #statusbar {
