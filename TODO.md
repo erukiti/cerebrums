@@ -1,11 +1,4 @@
-Phase.2
-=======
-
-* 一通りの access view を実装する
-* application の描画を整える
-
-
-
+順次 github issue に移す
 
 core
 ----
@@ -16,9 +9,7 @@ core
 application
 -----------
 
-* [ ] electron
-	* [ ] electron-updater
-	* [ ] gulp-electron
+* [ ] electron-updater
 * [ ] livereload 的なもの
 * [ ] browserify?
 * [ ] coffee script の行番号がズレる現象の究明
@@ -50,8 +41,6 @@ application
 * [ ] 外部CSS
 
 * タグ / star
-	* [x] ひとまず対応する
-	* [x] 検索で tag: star: に対応する
 	* [ ] access view で、タグ、starに対応したいかしたビューを作成する
 
 * タブ
@@ -69,6 +58,8 @@ application
 	- [x] ファイルサイズ情報を追加
 * 設定ビュー
 	- [ ] ディレクトリ設定
+	- [ ] フォントセレクタ
+		* https://github.com/Benvie/font/blob/master/index.js が使えるかも
 * [ ] エラーをステータスバーに表示する
 * [ ] ステータスバーにオープンしてるファイルの情報を表示する
 * [ ] window resize 情報をセーブ / ロード
@@ -85,6 +76,3 @@ application
 	- [ ] 編集中の絵文字表示 or 補完
 * [ ] code highlight
 * [ ] リストの [ ] に対応する？
-
-* [ ] システムダイアログ
-	- [ ] font-selector

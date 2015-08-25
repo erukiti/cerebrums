@@ -32,5 +32,8 @@
     "underscore": "^1.8.3",
     "uuid-v4": "^0.1.0",
     "webrx": "^0.9.87"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.0.2"
   }
 }
