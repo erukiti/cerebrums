@@ -15,9 +15,13 @@
 marked = require 'marked'
 ipc = require 'ipc'
 sprintf = require("sprintf-js").sprintf
+remote = require 'remote'
 
+Storage = require './src/storage.coffee'
+RawDriver = require './src/raw_driver.coffee'
+Rxfs = require './src/rxfs.coffee'
 EditorViewModel = require './editor_view_model.coffee'
-storage = require('./storage.coffee')
+AutoSaver = require './auto_saver.coffee'
 
 class PreviewViewModel
   constructor: ->
@@ -56,12 +60,14 @@ class AccessViewModel
     @search = wx.property ''
     @list = wx.list()
     @previewHtml = wx.property ''
+
     @open = wx.command (meta) =>
-      storage.open(meta.uuid).subscribe (packet) =>
+      Storage.load(meta.uuid).subscribe (packet) =>
         switch packet.type
           when 'content'
             content = new Buffer(packet.content)
             @previewHtml(marked(content.toString()))
+      , (err) => wx.messageBus.sendMessage err.message, 'status-bar'
 
       for _meta in @list.toArray()
         if _meta == meta
@@ -85,17 +91,17 @@ class AccessViewModel
     @search.changed.subscribe (query) =>
       if query
         @list.clear()
-        storage.search(query).subscribe (meta) =>
+        Storage.search(query).subscribe (meta) =>
           @listAdd.execute meta
       else
         @list.clear()
-        storage.getRecent().subscribe (meta) =>
+        Storage.getRecent().subscribe (meta) =>
           @listAdd.execute meta
 
   onChanged: ->
     unless @search()
       @list.clear()
-      storage.getRecent().subscribe (meta) =>
+      Storage.getRecent().subscribe (meta) =>
         @listAdd.execute meta
 
   setHeight: (height) ->
@@ -140,13 +146,14 @@ class PaneViewModel
     , this
 
     @openedList = wx.list()
+    @autoSaver = new AutoSaver()
 
     # FIXME: pane / view の二重配列に変更する
     @openedList.listChanged
-    .filter () =>
-      @elem.id == 'pane0'
-    .subscribe () =>
-      storage.tabs @openedList.toArray()
+      .filter =>
+        @elem.id == 'pane0'
+      .subscribe =>
+        @autoSaver.tabs @openedList.toArray()
 
     @tabView.changed.subscribe (tabView) =>
       if tabView.onChanged
@@ -173,7 +180,7 @@ class PaneViewModel
       i-- if i >= @tabs.length && i >= 0
       @tabChange.execute(@tabs.get(i).view) if @tabs.length > 0
 
-  new: (uuid) =>
+  new: (uuid, conf) =>
     if uuid && @openedList.contains(uuid)
         view = @searchView(uuid)
       else
@@ -183,7 +190,7 @@ class PaneViewModel
           when 'preview-view'
             view = new PreviewViewModel()
           else
-            view = new EditorViewModel(uuid)
+            view = new EditorViewModel(uuid, conf)
 
         uuid = view.uuid
         @addView(view)
@@ -428,6 +435,8 @@ wx.app.component 'access',
 </table>
 '''
 
+Storage.setRawDriver new RawDriver(new Rxfs(), remote.getGlobal('conf'))
+
 mainViewModel = new MainViewModel(0)
 
 wx.applyBindings(mainViewModel)
@@ -435,8 +444,10 @@ wx.applyBindings(mainViewModel)
 mainViewModel.addPane()
 mainViewModel.addPane()
 
-for uuid in storage.restore()
-  mainViewModel.panes.get(0).new(uuid)
+autoSaver = new AutoSaver()
+
+for restored in autoSaver.restore()
+  mainViewModel.panes.get(0).new(restored.uuid, restored.packet)
 
 mainViewModel.panes.get(1).new('preview-view')
 

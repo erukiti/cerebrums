@@ -20,11 +20,40 @@ BrowserWindow = remote.require 'browser-window'
 dialog = remote.require 'dialog'
 uuidv4 = require 'uuid-v4'
 
-storage = require './storage.coffee'
+Storage = require './src/storage.coffee'
+AutoSaver = require './auto_saver.coffee'
 
 class EditorViewModel
-  constructor: (uuid) ->
-    @uuid = uuid
+  _setMeta = (meta) ->
+    @title(meta.title)
+    @tags(meta.title)
+    if meta.star == '1'
+      @star('★')
+    else
+      @star('☆')
+
+  _setOriginalMeta = (meta) ->
+    @originalTitle(meta.title)
+    @originalTags(meta.title)
+    if meta.star == '1'
+      @originalStar('★')
+    else
+      @originalStar('☆')
+
+  _setContent = (content) ->
+    console.log "setContent: #{content}"
+    @text content.toString('utf-8')
+
+  _setOriginalContent = (content) ->
+    console.log "setOriginalContent: #{content}"
+    @originalText content.toString('utf-8')
+
+  constructor: (uuid, initPacket) ->
+    if uuid
+      @uuid = uuid
+    else
+      @uuid = uuidv4()
+
     @title = wx.property ''
     @text = wx.property ''
     @html = wx.property '<editor></editor>'
@@ -42,11 +71,13 @@ class EditorViewModel
       star != originalStar ||
       tags != originalTags
     .toProperty()
+    # @isDirty.changed.subscribe (isDirty) =>
+    #   BrowserWindow.getFocusedWindow().setDocumentEdited(isDirty)
 
     @meta = {title: '', tags: '', star: '0'}
 
-    # @isDirty.changed.subscribe (isDirty) =>
-    #   BrowserWindow.getFocusedWindow().setDocumentEdited(isDirty)
+    @storage = new Storage(@uuid)
+    @autoSaver = new AutoSaver()
 
     @clickStar = wx.command () =>
       if (@star() == '☆')
@@ -59,101 +90,64 @@ class EditorViewModel
         when 'save'
           wx.messageBus.sendMessage @uuid, 'save'
 
-    _save = Rx.Observable.create (obs) =>
-      @title.changed.subscribe (title) =>
-        @meta['title'] = title
+    @title.changed.subscribe (title) =>
+      @meta['title'] = title
+      @autoSaver.save @uuid, @meta, @text()
+    
+    @tags.changed.subscribe (tags) =>
+      @meta['tags'] = tags
+      @autoSaver.save @uuid, @meta, @text()
 
-        obs.onNext
-          type: 'change'
-          meta: @meta
-          content: @text()
-      
-      @tags.changed.subscribe (tags) =>
-        @meta['tags'] = tags
+    @star.changed.subscribe (star) =>
+      if star == '★'
+        @meta['star'] = '1'
+      else
+        @meta['star'] = '0'
+      @autoSaver.save @uuid, @meta, @text()
 
-        obs.onNext
-          type: 'change'
-          meta: @meta
-          content: @text()
+    @text.changed.subscribe (text) =>
+      @autoSaver.save @uuid, @meta, text
 
-      @star.changed.subscribe (star) =>
-        if star == '★'
-          @meta['star'] = '1'
-        else
-          @meta['star'] = '0'
+    wx.messageBus.listen('save').subscribe (uuid) =>
+      return if uuid != @uuid
+      if @isDirty()
+        @storage.save @meta, @text
+        @autoSaver.save @uuid, @meta, @text
 
-        obs.onNext
-          type: 'change'
-          meta: @meta
-          content: @text()
+        @originalTitle @title()
+        @originalText @text()
+        @originalStar @star()
+        @originalTags @tags()
 
-      @text.changed.subscribe (text) =>
-        obs.onNext
-          type: 'change'
-          meta: @meta
-          content: text
+      else
+        wx.messageBus.sendMessage 'no saved', 'status-bar'
 
-      wx.messageBus.listen('save').subscribe (uuid) =>
-        return if uuid != @uuid
-        if @isDirty()
-          obs.onNext
-            type: 'save'
-            meta: @meta
-            content: @text()
+    if initPacket
+      console.log initPacket.content
+      _setMeta.call @, initPacket.meta
+      _setContent.call @, initPacket.content
 
-          @originalTitle @title()
-          @originalText @text()
-          @originalStar @star()
-          @originalTags @tags()
-
-        else
-          wx.messageBus.sendMessage 'no saved', 'status-bar'
-
-      wx.messageBus.listen('close').subscribe (uuid) =>
-        return if uuid != @uuid
-        # obs.onNext
-        #   type: 'close'
-        obs.onCompleted()
-
-    storageObs = if uuid
-      storage.open(uuid, _save)
-    else
-      @uuid = uuidv4()
-      storage.create(@uuid, _save)
-
-    storageObs.subscribe (packet) =>
-      console.dir packet
+    @storage.observable.subscribe (packet) =>
       switch packet.type
         when 'meta'
-          @meta = packet.meta
-          @title(@meta.title)
-          if @meta['star'] == '1'
-            @star('★')
-          else
-            @star('☆')
-          @tags(@meta['tags'])
-
-          if !packet.isDirty
-            @originalTitle @title()
-            @originalStar @star()
-            @originalTags @tags()
+          unless initPacket
+            _setMeta.call @, packet.meta
+            console.log '******'
+          _setOriginalMeta.call @, packet.meta
 
         when 'content'
-          content = new Buffer(packet.content)
-          @text(content.toString())
-
-          if !packet.isDirty
-            @originalText @text()
+          unless initPacket
+            _setContent.call @, packet.content
+            console.log '******'
+          _setOriginalContent.call @, packet.content
 
         when 'saved'
-          wx.messageBus.sendMessage "saved", 'status-bar'
+          wx.messageBus.sendMessage 'saved', 'status-bar'
 
-        when 'uuid'
-          @uuid = packet.uuid
-
-        else
-          console.error 'unknown packet'
-          console.dir packet
+        when 'error'
+          wx.messageBus.sendMessage packet.error.message, 'status-bar'
+          console.dir err
+    @storage.load()
 
   setHeight: (height) ->
     if height
@@ -189,14 +183,22 @@ class EditorViewModel
     @id = id
 
   previewObservable: ->
-    @text.changed.merge(Rx.Observable.just(@text())).map (text) =>
-      marked(text)
+    Rx.Observable.create (obs) =>
+      @text.changed.subscribe (text) =>
+        obs.onNext marked(text)
+      obs.onNext marked(@text())
 
   titleObservable: ->
-    @title.changed.merge(Rx.Observable.just(''))
+    Rx.Observable.create (obs) =>
+      @title.changed.subscribe (title) =>
+        obs.onNext title
+      obs.onNext @title()
 
   isDirtyObservable: ->
-    @isDirty.changed.merge(Rx.Observable.just(false))
+    Rx.Observable.create (obs) =>
+      @isDirty.changed.subscribe (isDirty) =>
+        obs.onNext isDirty
+      obs.onNext @isDirty()
 
   closeOk: ->
     return true unless @isDirty()
